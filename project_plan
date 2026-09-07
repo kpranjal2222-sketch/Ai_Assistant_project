@@ -1,0 +1,113 @@
+  # PROJECT PLAN & PROGRESS LOG
+### Project: CONSTRUCTION MANAGEMENT
+### Subject: AI-Assisted Coding (College Project)
+
+> **This file is the single source of truth.** If a new session starts, read this
+> file first to recall everything: decisions, plan, and what's done so far.
+
+---
+
+## 1. PROJECT SUMMARY
+- **Full title:** AI-Assisted Construction Project Monitoring & Safety Management Platform
+- **Short name:** CONSTRUCTION MANAGEMENT
+- **Deliverables:** (1) A working web app  +  (2) A written report/documentation
+- **Developer level:** Beginner (needs clear explanations; AI writes the code)
+- **Team:** Solo
+- **Timeline:** ~1 week
+- **Platform:** Windows 11, Git Bash shell
+
+---
+
+## 2. KEY DECISIONS (locked)
+- **Language:** Python **3.11** (launch with `py -3.11`). Do NOT use 3.14 — AI
+  libraries (PyTorch/YOLO) not yet compatible.
+- **Stack:** Streamlit (UI) + Ultralytics YOLO (AI) + SQLite (DB) + Plotly (charts)
+- **Approach:** Use a PRE-TRAINED YOLO model for PPE detection (don't train from scratch)
+
+## 3. FEATURE SCOPE
+**CORE (build for sure):**
+- [ ] PPE Safety Detection (upload photo → detect missing helmet/vest) ⭐
+- [ ] Progress Tracker (tasks + % complete + charts)
+- [ ] Incident Log (save checks to SQLite database)
+- [ ] Basic Alerts (violation warnings + recent alerts on dashboard)
+
+**STRETCH (only if time left at the end):**
+- [ ] Worker Attendance
+- [ ] In-app Auto Report generation
+
+---
+
+## 4. APP STRUCTURE (planned pages)
+- 🏠 Home/Dashboard — overview stats, compliance %, recent alerts, charts
+- 🪖 Safety Detection — upload photo, AI marks violations
+- 📋 Incident Log — table of all past checks
+- 📈 Progress Tracker — task progress vs schedule
+
+---
+
+## 5. DAY-BY-DAY PLAN
+| Day | Goal | Status |
+|-----|------|--------|
+| 1 | Install tools + blank app running | ✅ DONE |
+| 2 | AI detects PPE on uploaded photo | ✅ DONE |
+| 3 | Safety page: boxes + violation summary | ⬜ Not started |
+| 4 | Incident log + database + dashboard charts | ⬜ Not started |
+| 5 | Progress tracker page + UI polish | ⬜ Not started |
+| 6 | Testing + screenshots (+ stretch goals?) | ⬜ Not started |
+| 7 | Write the report/documentation | ⬜ Not started |
+
+---
+
+## 6. PROGRESS LOG (newest at top — update every session)
+- **[Day 2 — 2026-09-07] ✅ COMPLETE** — AI PPE detection working end-to-end:
+  - Verified base YOLO (yolov8n.pt) downloads & runs (knows "person", not PPE).
+  - Downloaded PPE models from Hugging Face. Tested TWO on real photos:
+    * keremberke/yolov8m-hard-hat-detection → classes Hardhat / NO-Hardhat. WORKS WELL.
+    * keremberke/yolov8m-protective-equipment-detection (10 classes) → detected
+      almost nothing on real photos. DELETED. Lesson: more classes != better.
+  - CHOSE the hard-hat model (models/ppe_model.pt). User confirmed helmet-only scope;
+    vest/other PPE listed as future work.
+  - Wrote app/detector.py — loads model once (cached), detect_ppe(image) returns
+    annotated PIL image + summary dict (total, helmet_ok, violations, compliance %).
+    Green box = helmet OK, red box = NO helmet.
+  - Tuned confidence threshold: tested 0.25-0.55 on real construction photos.
+    0.35 is the sweet spot (lower over-detects, higher misses real helmets). SET to 0.35.
+  - Lesson learned: one stock "worker" download was an office desk → model false-
+    flagged a hand/calculator as NO-Helmet. Fix = use real construction photos +
+    0.35 threshold. Good story for the report (garbage-in-garbage-out, thresholds).
+  - Wired detection into app/main.py Safety Detection page: upload photo → shows
+    original + annotated side by side, metrics (workers/helmets/violations),
+    compliance % bar, and red ALERT or green OK message.
+  - 4 sample construction images kept in sample_images/. App restarts clean (HTTP 200).
+  - NOTE: use st.image(..., use_container_width=True) (not deprecated use_column_width).
+
+
+- **[Day 1 — 2026-09-07] ✅ COMPLETE** — Full setup done and app running:
+  - Created folders: app, data, models, sample_images, docs
+  - Created virtual environment `venv` with Python 3.11 (activate:
+    `source venv/Scripts/activate` in Git Bash)
+  - Installed & verified: streamlit 1.63.0, ultralytics 8.4.142, torch 2.14.0+cpu,
+    opencv, plotly, pandas, pillow. Saved to requirements.txt (63 lines).
+  - Wrote `app/main.py` — base app with 4 placeholder pages (Dashboard, Safety
+    Detection, Incident Log, Progress Tracker) + sidebar navigation.
+  - App launched OK: `streamlit run app/main.py` → http://localhost:8501 (HTTP 200).
+  - NOTE: on Windows, always read files with encoding="utf-8" (cp1252 default
+    breaks on emoji/special chars). Streamlit itself is fine.
+- **[Day 1 — 2026-09-07]** Confirmed Python 3.11.9 + pip working. Project name set
+  to CONSTRUCTION MANAGEMENT. Created README.md and this plan file.
+
+---
+
+## 7. ENVIRONMENT NOTES
+- Python versions installed: 3.14.2 (default `python`), 3.13, **3.11.9** (`py -3.11`)
+- pip: working
+- Project folder: c:\Users\kpran\Desktop\SilentGuard  (folder still named "SilentGuard";
+  user may rename later — that's fine)
+- Shell: Git Bash (use `source venv/Scripts/activate` to activate venv)
+
+---
+
+## 8. HOW AI ASSISTED (notes for the report's "AI-Assisted Coding" section)
+- Used Claude Code (AI assistant) to: research the topic, plan the project, choose
+  the tech stack, write all code, and draft documentation.
+- (Keep adding examples here as we go — e.g., bugs the AI fixed, code it generated.)
