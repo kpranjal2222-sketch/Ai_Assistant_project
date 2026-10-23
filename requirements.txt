@@ -1,0 +1,12 @@
+fastapi==0.141.1
+fpdf2==2.8.8
+httpx==0.28.1
+numpy==2.4.6
+opencv-python==5.0.0.93
+pandas==3.0.5
+Pillow==12.3.0
+python-multipart==0.0.32
+torch==2.14.0
+torchvision==0.29.0
+ultralytics==8.4.142
+uvicorn==0.52.4

@@ -1,0 +1,17 @@
+{
+  "name": "sitesentinel-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tailwindcss -i web/static/css/tailwind.input.css -o web/static/css/tailwind.generated.css --minify && node scripts/build_frontend.cjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "chart.js": "4.4.3",
+    "lucide": "0.468.0",
+    "tailwindcss": "4.3.3"
+  },
+  "overrides": {
+    "@parcel/watcher": "2.6.0"
+  }
+}

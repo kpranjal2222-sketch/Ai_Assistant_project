@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SiteSentinel - Construction Safety Review</title>
+  <link rel="icon" href="data:," />
+
+  <!-- Set the saved theme BEFORE paint. Default is DARK for industrial command center aesthetics -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cm-theme-v2");
+        if (!t) {
+          t = "dark";
+          localStorage.setItem("cm-theme-v2", "dark");
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/css/tailwind.generated.css?v=v10-reviewed-followup" />
+  <link rel="stylesheet" href="/css/styles.css?v=v21-authentication" />
+  <script defer src="/vendor/chart.umd.js?v=v19-location-model"></script>
+  <script defer src="/vendor/lucide.min.js?v=v19-location-model"></script>
+</head>
+
+<body class="min-h-screen">
+
+  <section id="authGate" class="auth-gate" aria-labelledby="authGateTitle">
+    <article class="card auth-card">
+      <div class="logo-badge"><i data-lucide="shield-check"></i></div>
+      <span class="site-map-kicker mt-3">SITESENTINEL / ACCOUNT ACCESS</span>
+      <h1 id="authGateTitle" class="text-2xl font-bold mt-1">Secure project access</h1>
+      <p id="authGateIntro" class="text-sm mt-2" style="color:var(--ink-2)">Sign in to access project records and review tools.</p>
+      <form id="authLoginForm" class="auth-form hidden">
+        <label for="authLoginUsername">Username</label>
+        <input id="authLoginUsername" name="username" autocomplete="username" required maxlength="32" />
+        <label for="authLoginPassword">Password</label>
+        <input id="authLoginPassword" name="password" type="password" autocomplete="current-password" required maxlength="256" />
+        <button class="btn-primary justify-center mt-2" type="submit">Sign in</button>
+      </form>
+      <form id="authSetupForm" class="auth-form hidden">
+        <p class="auth-setup-note">Create the first administrator account. Use a unique password with at least 12 characters.</p>
+        <label for="authSetupName">Display name</label>
+        <input id="authSetupName" name="display_name" autocomplete="name" required maxlength="80" />
+        <label for="authSetupUsername">Username</label>
+        <input id="authSetupUsername" name="username" autocomplete="username" required minlength="3" maxlength="32" />
+        <label for="authSetupPassword">Password</label>
+        <input id="authSetupPassword" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="256" />
+        <label for="authSetupToken" id="authSetupTokenLabel" class="hidden">One-time setup token</label>
+        <input id="authSetupToken" name="setup_token" class="hidden" autocomplete="off" />
+        <button class="btn-primary justify-center mt-2" type="submit">Create administrator</button>
+      </form>
+      <p id="authMessage" class="text-sm mt-3" role="status" aria-live="polite"></p>
+      <p class="auth-privacy-note">Accounts use server-side password hashing and expiring, HTTP-only sessions. Keep this local app bound to a trusted interface.</p>
+    </article>
+  </section>
+
+  <!-- ===================== INDUSTRIAL TOPBAR & DESKTOP NAV ===================== -->
+  <header class="topbar">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4 h-16">
+      <div class="flex items-center gap-3">
+        <button class="icon-btn" id="menuToggle" title="Menu" aria-label="Open navigation menu">
+          <i data-lucide="menu"></i>
+        </button>
+        <a class="nav-logo flex items-center gap-2.5 font-bold text-lg cursor-pointer" data-view="landing">
+          <span class="logo-badge"><i data-lucide="shield-check"></i></span>
+          <div class="leading-tight">
+            <div class="flex items-center gap-1.5">
+              <span class="tracking-tight font-display font-bold">SiteSentinel</span>
+              <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">FIELD REVIEW</span>
+            </div>
+            <div class="text-[9px] font-mono tracking-wider text-[var(--ink-2)] uppercase">CONSTRUCTION / SAFETY</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation Bar -->
+      <nav id="topbarNav" class="items-center gap-1 font-mono text-xs" aria-label="Primary">
+        <a class="nav-link" data-view="sentinel" title="Frame Review"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>Frame Review</a>
+        <a class="nav-link" data-view="map" title="Site Map"><i data-lucide="map" class="w-3.5 h-3.5"></i>Site Map</a>
+        <a class="nav-link" data-view="tickets" title="Incidents"><i data-lucide="ticket" class="w-3.5 h-3.5"></i>Incidents</a>
+        <a class="nav-link" data-view="air-quality" title="Air Quality"><i data-lucide="wind" class="w-3.5 h-3.5"></i>Air Quality</a>
+        <a class="nav-link" data-view="dashboard" title="Overview"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>Overview</a>
+        <a class="nav-link" data-view="attendance" title="Check-in"><i data-lucide="user-check" class="w-3.5 h-3.5"></i>Check-in</a>
+        <a class="nav-link" data-view="detect" title="Photo Review"><i data-lucide="camera" class="w-3.5 h-3.5"></i>Photo Review</a>
+        <a class="nav-link" data-view="video" title="Video Review"><i data-lucide="video" class="w-3.5 h-3.5"></i>Video Review</a>
+        <a class="nav-link" data-view="tracker" title="Progress"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>Progress</a>
+        <a class="nav-link" data-view="reports" title="Reports"><i data-lucide="file-text" class="w-3.5 h-3.5"></i>Reports</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <div id="topbarRiskBadge" class="hud-pill info hidden md:inline-flex cursor-pointer text-[11px] font-mono" onclick="showView('dashboard')">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> TICKET RISK: <span id="topbarRiskScore" class="font-bold">--</span>
+        </div>
+        <span id="signedInUser" class="signed-in-user hidden"></span>
+        <button id="manageUsersButton" class="btn-ghost account-action hidden" type="button">Accounts</button>
+        <button id="signOutButton" class="btn-ghost account-action hidden" type="button" aria-label="Sign out">Sign out</button>
+        <button class="theme-toggle" id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme">
+          <i data-lucide="sun" id="themeIcon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== SLIDE-IN NAV DRAWER (MOBILE) ===================== -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer" aria-label="Navigation">
+    <div class="drawer-head">
+      <span class="font-bold text-lg flex items-center gap-2">
+        <span class="logo-badge"><i data-lucide="shield-check"></i></span> SiteSentinel V2
+      </span>
+      <button class="icon-btn" id="menuClose" title="Close" aria-label="Close menu"><i data-lucide="x"></i></button>
+    </div>
+    <nav class="flex flex-col gap-1" id="nav">
+      <a class="nav-link" data-view="sentinel"><i data-lucide="shield-alert"></i>Frame Review</a>
+      <a class="nav-link" data-view="map"><i data-lucide="map"></i>Illustrative Site Map</a>
+      <a class="nav-link" data-view="tickets"><i data-lucide="ticket"></i>Incident Follow-up</a>
+      <a class="nav-link" data-view="air-quality"><i data-lucide="wind"></i>Air Quality &amp; Weather</a>
+      <a class="nav-link" data-view="dashboard"><i data-lucide="layout-dashboard"></i>Site Dashboard</a>
+      <a class="nav-link" data-view="attendance"><i data-lucide="user-check"></i>Worker Check-in</a>
+      <a class="nav-link" data-view="detect"><i data-lucide="camera"></i>Photo Safety AI</a>
+      <a class="nav-link" data-view="video"><i data-lucide="video"></i>Video Detection</a>
+      <a class="nav-link" data-view="tracker"><i data-lucide="bar-chart-3"></i>Progress Tracker</a>
+      <a class="nav-link" data-view="reports"><i data-lucide="file-text"></i>Reports</a>
+      <a class="nav-link" data-view="log"><i data-lucide="clipboard-list"></i>Photo Incident Log</a>
+    </nav>
+  </aside>
+
+  <section id="userManagementDialog" class="user-management-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="userManagementTitle">
+    <article class="card user-management-card">
+      <div class="air-quality-card-heading">
+        <div><span class="site-map-kicker">ADMINISTRATOR</span><h2 id="userManagementTitle" class="font-semibold mt-1">Account management</h2></div>
+        <button id="closeUserManagement" class="btn-ghost" type="button">Close</button>
+      </div>
+      <form id="createUserForm" class="user-create-form">
+        <label for="newUserName">Display name</label><input id="newUserName" name="display_name" required maxlength="80" />
+        <label for="newUserUsername">Username</label><input id="newUserUsername" name="username" required minlength="3" maxlength="32" autocomplete="off" />
+        <label for="newUserPassword">Initial password</label><input id="newUserPassword" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password" />
+        <label for="newUserRole">Role</label>
+        <select id="newUserRole" name="role"><option value="viewer">Viewer</option><option value="supervisor">Supervisor</option><option value="admin">Administrator</option></select>
+        <button class="btn-primary" type="submit">Create account</button>
+      </form>
+      <p class="text-xs mt-2" style="color:var(--ink-2)">Set a unique password for each account and share it securely. Viewer accounts can only read.</p>
+      <div id="managedUsers" class="managed-users"></div>
+      <p id="userManagementMessage" class="text-sm mt-2" role="status"></p>
+    </article>
+  </section>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- ===================== PROJECT OVERVIEW ===================== -->
+    <section id="view-landing" class="view active">
+      <div class="hero">
+        <div class="hero-layout">
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="eyebrow-mark"></span> SITE SENTINEL / FIELD REVIEW</div>
+            <h1>Construction safety review.<br /><span class="accent">Field checks, locally.</span></h1>
+            <p class="lead">
+              Review PPE checks, sample site issues, and daily construction follow-up in one local workspace.
+            </p>
+            <p class="hero-note">A local project demo — not certified safety advice or unattended CCTV monitoring.</p>
+            <div class="flex flex-wrap gap-3 mb-6">
+              <button class="btn-primary" data-view="detect"><i data-lucide="scan-search" class="w-4 h-4"></i>Review an inspection</button>
+              <button class="btn-ghost" data-view="tickets"><i data-lucide="clipboard-check" class="w-4 h-4"></i>Follow up an incident</button>
+              <button class="btn-ghost" data-view="dashboard"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Open project overview</button>
+            </div>
+            <div class="hero-stats" id="heroStats" aria-label="Saved project summary">
+              <!-- Summary populated from saved inspections, tickets, and configured zones. -->
+            </div>
+          </div>
+          <aside class="hero-aside" aria-label="Project workflow">
+            <div class="hero-aside-head">
+              <span class="eyebrow">WORKFLOW / 01—04</span>
+              <span class="status-dot" aria-hidden="true"></span>
+            </div>
+            <div class="workflow-step"><span>01</span><div><strong>Review</strong><small>Photo, clip, or local camera</small></div><i data-lucide="scan-line"></i></div>
+            <div class="workflow-step"><span>02</span><div><strong>Record</strong><small>Save checks and evidence</small></div><i data-lucide="archive"></i></div>
+            <div class="workflow-step"><span>03</span><div><strong>Respond</strong><small>Log and resolve incidents</small></div><i data-lucide="clipboard-check"></i></div>
+            <div class="workflow-step"><span>04</span><div><strong>Report</strong><small>Export a project summary</small></div><i data-lucide="file-down"></i></div>
+            <div class="hero-aside-foot">LOCAL DEMO DATA <span>·</span> HUMAN REVIEW REQUIRED</div>
+          </aside>
+        </div>
+      </div>
+
+      <div class="section-kicker"><span>PROJECT TOOLS</span><span>Choose a workflow to get started</span></div>
+      <div class="grid md:grid-cols-4 gap-4 mt-6">
+        <div class="feature-card" data-view="sentinel" role="button" tabindex="0">
+          <div class="feature-ic"><i data-lucide="shield-alert"></i></div>
+          <h3 class="font-semibold mb-1 flex items-center justify-between">
+            <span>Frame review</span>
+            <span class="feature-tag">DEMO</span>
+          </h3>
+          <p class="text-xs" style="color:var(--ink-2)">Analyze included sample clips or opt in to your local webcam. Processing runs only while this page is open.</p>
+        </div>
+        <div class="feature-card" data-view="map" role="button" tabindex="0">
+          <div class="feature-ic"><i data-lucide="map"></i></div>
+          <h3 class="font-semibold mb-1 flex items-center justify-between">
+            <span>Illustrative site map</span>
+            <span class="feature-tag">5 ZONES</span>
+          </h3>
+          <p class="text-xs" style="color:var(--ink-2)">Explore a schematic site arrangement, configured zones, and local demo sources. No worker locations or live camera feeds are shown.</p>
+        </div>
+        <div class="feature-card" data-view="air-quality" role="button" tabindex="0">
+          <div class="feature-ic"><i data-lucide="wind"></i></div>
+          <h3 class="font-semibold mb-1 flex items-center justify-between">
+            <span>Air quality &amp; weather</span>
+            <span class="feature-tag">LOCATION MODEL</span>
+          </h3>
+          <p class="text-xs" style="color:var(--ink-2)">View regional air quality and weather, then explore a separate construction activity scenario.</p>
+        </div>
+        <div class="feature-card" data-view="tickets" role="button" tabindex="0">
+          <div class="feature-ic"><i data-lucide="ticket"></i></div>
+          <h3 class="font-semibold mb-1 flex items-center justify-between">
+            <span>Incident follow-up</span>
+            <span class="feature-tag">LOG / RESOLVE</span>
+          </h3>
+          <p class="text-xs" style="color:var(--ink-2)">Log incidents, add a supervisor note, and move each ticket from open to remediated.</p>
+        </div>
+        <div class="feature-card" data-view="reports" role="button" tabindex="0">
+          <div class="feature-ic"><i data-lucide="file-check-2"></i></div>
+          <h3 class="font-semibold mb-1 flex items-center justify-between">
+            <span>Project report</span>
+            <span class="feature-tag">PDF</span>
+          </h3>
+          <p class="text-xs" style="color:var(--ink-2)">Export a locally generated summary of saved inspections, incidents, and task progress.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SITESENTINEL LIVE COMMAND CENTER ===================== -->
+    <section id="view-sentinel" class="view">
+      <!-- Review status -->
+      <div class="command-status-bar">
+        <div class="flex items-center gap-3">
+          <span class="hud-pill info" id="sentinelStatusBadge"><i data-lucide="circle-pause" class="w-3.5 h-3.5"></i> DEMO FEED IDLE</span>
+          <span class="text-xs font-mono" style="color:var(--ink-2)">SOURCE: <span id="activeCamName" style="color:var(--ink);font-weight:600">SAMPLE CLIP A</span></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" class="btn-ghost font-mono text-xs py-1.5 px-3 flex items-center gap-1.5" id="btnToggleSiren">
+            <i data-lucide="volume-2" class="w-3.5 h-3.5" id="sirenIcon"></i> <span id="sirenLabel">SIREN: ARMED</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sample media and optional local webcam -->
+      <div class="cam-selector">
+        <button type="button" class="cam-btn active" data-cam="cam1"><i data-lucide="video" class="w-3.5 h-3.5 inline mr-1"></i>SAMPLE CLIP A</button>
+        <button type="button" class="cam-btn" data-cam="cam2"><i data-lucide="video" class="w-3.5 h-3.5 inline mr-1"></i>SAMPLE CLIP B</button>
+        <button type="button" class="cam-btn" data-cam="cam3"><i data-lucide="rotate-cw" class="w-3.5 h-3.5 inline mr-1"></i>REPLAY CLIP A</button>
+        <button type="button" class="cam-btn" data-cam="webcam"><i data-lucide="camera" class="w-3.5 h-3.5 inline mr-1"></i>LOCAL WEBCAM</button>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-4">
+        <!-- Main Surveillance Screen (2 cols) -->
+        <div class="lg:col-span-2 space-y-3">
+          <div class="sentinel-viewport" id="sentinelViewport">
+            <!-- Hidden video elements for stream feeds -->
+            <video id="sentinelVideo" class="hidden" loop muted playsinline></video>
+            <video id="webcamVideo" class="hidden" autoplay playsinline muted></video>
+            <!-- Canvas where frame + HUD are rendered -->
+            <canvas id="sentinelCanvas" class="w-full h-auto max-h-[500px] object-contain block"></canvas>
+            <div id="sentinelPlaceholder" class="text-center p-8">
+              <i data-lucide="shield-alert" class="w-12 h-12 mx-auto mb-3" style="color:var(--orange)"></i>
+              <h3 class="font-bold text-base mb-1">Choose a source to review</h3>
+              <p class="text-xs mb-4" style="color:var(--ink-2)">Sample clips are processed locally by the demo. Webcam access requires your permission and stops when you leave this view.</p>
+              <button type="button" class="btn-primary mx-auto" id="btnStartSentinel"><i data-lucide="play" class="w-4 h-4"></i>Start review</button>
+            </div>
+          </div>
+
+          <!-- Controls under viewport -->
+          <div class="card p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+              <button type="button" class="btn-primary py-1.5 px-3 flex items-center gap-1.5" id="btnSentinelPlay"><i data-lucide="play" class="w-3.5 h-3.5"></i>Start Stream</button>
+              <button type="button" class="btn-ghost py-1.5 px-3 flex items-center gap-1.5" id="btnSentinelPause" disabled><i data-lucide="pause" class="w-3.5 h-3.5"></i>Pause</button>
+              <button type="button" class="btn-ghost py-1.5 px-3 flex items-center gap-1.5" id="btnSentinelSnap" disabled><i data-lucide="camera" class="w-3.5 h-3.5"></i>Capture Snapshot</button>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-xs" style="color:var(--ink-2)">Sens: <span id="sentinelConfVal">0.35</span></span>
+              <input type="range" id="sentinelConf" min="0.10" max="0.75" step="0.05" value="0.35" class="w-24" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry & Real-Time Incident Stream (1 col) -->
+        <div class="space-y-4">
+          <!-- Live Telemetry Card -->
+          <div class="card p-4 space-y-3">
+            <h2 class="font-semibold text-xs uppercase tracking-wider flex items-center justify-between" style="color:var(--ink-2)">
+              <span>Site Telemetry</span>
+              <span class="hud-pill info font-mono text-[11px]" id="liveFps">0.0 FPS</span>
+            </h2>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2.5 rounded bg-[var(--surface-2)] border border-[var(--border)]">
+                <div class="text-[11px]" style="color:var(--ink-2)">Tracked Workers</div>
+                <div class="text-lg font-bold font-mono" id="liveWorkersCount">0</div>
+              </div>
+              <div class="p-2.5 rounded bg-[var(--surface-2)] border border-[var(--border)]">
+                <div class="text-[11px]" style="color:var(--ink-2)">Active Violations</div>
+                <div class="text-lg font-bold font-mono text-red-500" id="liveViolationsCount">0</div>
+              </div>
+            </div>
+            <!-- Active Tracked Workers list -->
+            <div>
+              <div class="text-[11px] font-semibold mb-1.5" style="color:var(--ink-2)">Active Personnel</div>
+              <div id="trackedWorkersList" class="space-y-1 text-xs max-h-24 overflow-y-auto">
+                <div class="text-[11px] italic" style="color:var(--muted)">No workers detected — assessment inconclusive.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Real-Time Incident Ticker -->
+          <div class="card p-4">
+            <h2 class="font-semibold text-xs uppercase tracking-wider mb-2 flex items-center justify-between" style="color:var(--ink-2)">
+              <span>Session events</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            </h2>
+            <div class="incident-stream" id="incidentStream">
+              <div class="text-xs italic p-2" style="color:var(--muted)">Events from the current review will appear here.</div>
+            </div>
+          </div>
+
+          <!-- Auto-Captured Evidence Snapshots -->
+          <div class="card p-4">
+            <h2 class="font-semibold text-xs uppercase tracking-wider mb-2" style="color:var(--ink-2)">Evidence Captures (Auto-Saved)</h2>
+            <div class="evidence-grid" id="evidenceGrid">
+              <!-- Dynamically populated thumbnails -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ILLUSTRATIVE SITE MAP ===================== -->
+    <section id="view-map" class="view">
+      <div class="site-map-heading">
+        <div>
+          <span class="site-map-kicker">PROJECT LAYOUT / FIELD REFERENCE</span>
+          <h1 class="text-2xl font-bold mt-1 mb-1">Custom site layout</h1>
+          <p class="text-sm" style="color:var(--ink-2)">Explore the original site-plan illustration, configured hazard areas, facilities, and access routes.</p>
+        </div>
+        <span class="hud-pill info font-mono flex items-center gap-1.5"><i data-lucide="map" class="w-3.5 h-3.5"></i> ILLUSTRATIVE · NOT SURVEYED</span>
+      </div>
+
+      <div class="site-map-layout">
+        <div class="card site-plan-card">
+          <div class="site-plan-toolbar">
+            <div>
+              <span class="site-map-kicker">CONSTRUCTION AREA</span>
+              <div class="site-plan-title">Illustrative site arrangement</div>
+            </div>
+            <span class="site-plan-note">REFERENCE ONLY <span aria-hidden="true">·</span> NO LIVE DATA</span>
+          </div>
+          <div class="site-map-controls" aria-label="Site plan layers">
+            <span class="site-map-control-label">LAYERS</span>
+            <label><input type="checkbox" data-map-layer="zones" checked> Hazard zones</label>
+            <label><input type="checkbox" data-map-layer="facilities" checked> Site facilities</label>
+            <label><input type="checkbox" data-map-layer="routes" checked> Roads &amp; gate</label>
+            <label><input type="checkbox" data-map-layer="sources" checked> Demo sources</label>
+          </div>
+          <div class="site-plan-viewport">
+            <svg id="sitePlan" class="site-plan" viewBox="0 0 1000 650" role="img" aria-labelledby="sitePlanTitle sitePlanDescription">
+              <title id="sitePlanTitle">Custom illustrative construction site layout</title>
+              <desc id="sitePlanDescription">An original, hand-drawn, not-surveyed top-down construction plan with a perimeter fence, access gate, haul route, support facilities, emergency assembly point, crane, and five selectable configured zones. Zone colors reflect configured risk labels, not measured site conditions.</desc>
+              <defs>
+                <pattern id="siteGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" class="site-grid-line" fill="none"/>
+                </pattern>
+                <pattern id="concreteHatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+                  <line x1="0" y1="0" x2="0" y2="12" class="site-hatch-line"/>
+                </pattern>
+                <pattern id="soilHatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                  <line x1="0" y1="0" x2="0" y2="10" class="site-soil-line"/>
+                </pattern>
+                <filter id="zoneShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#10140f" flood-opacity=".16"/>
+                </filter>
+              </defs>
+
+              <rect width="1000" height="650" class="site-ground"/>
+              <rect width="1000" height="650" fill="url(#siteGrid)" opacity=".68"/>
+
+              <!-- Perimeter and site access -->
+              <rect x="42" y="38" width="916" height="574" rx="16" class="site-perimeter"/>
+              <path d="M44 548 H110 V510 H892 V132 H925" class="site-haul-road"/>
+              <path d="M44 548 H110 V510 H892 V132 H925" class="site-road-center"/>
+              <path d="M42 548 H95" class="site-gate-line"/>
+              <path d="M42 533 V563 M52 533 V563 M62 533 V563 M72 533 V563 M82 533 V563" class="site-gate-post"/>
+              <g class="site-label" transform="translate(66 584)">
+                <rect width="126" height="25" rx="6" class="site-label-bg"/>
+                <text x="12" y="17">SITE ACCESS GATE</text>
+              </g>
+              <text x="142" y="499" class="site-road-label">INTERNAL HAUL ROUTE</text>
+
+              <!-- Site support facilities -->
+              <g class="site-building" transform="translate(108 72)">
+                <rect width="150" height="50" rx="5" class="site-building-shell"/>
+                <path d="M12 13 H138 M12 25 H138 M12 37 H138" class="site-building-detail"/>
+                <text x="75" y="31" text-anchor="middle" class="site-building-label">SITE OFFICE</text>
+              </g>
+              <g class="site-building" transform="translate(272 72)">
+                <rect width="70" height="50" rx="5" class="site-building-shell"/>
+                <path d="M10 13 H60 M10 25 H60 M10 37 H60" class="site-building-detail"/>
+                <text x="35" y="31" text-anchor="middle" class="site-building-label">FIRST AID</text>
+              </g>
+              <g class="site-building" transform="translate(770 72)">
+                <rect width="126" height="50" rx="5" class="site-building-shell"/>
+                <path d="M12 13 H114 M12 25 H114 M12 37 H114" class="site-building-detail"/>
+                <text x="63" y="31" text-anchor="middle" class="site-building-label">MATERIALS</text>
+              </g>
+              <g class="site-building" transform="translate(790 535)">
+                <rect width="98" height="46" rx="5" class="site-building-shell"/>
+                <path d="M12 12 H86 M12 23 H86 M12 34 H86" class="site-building-detail"/>
+                <text x="49" y="28" text-anchor="middle" class="site-building-label">PARKING</text>
+              </g>
+              <g class="site-building" transform="translate(674 535)">
+                <rect width="92" height="46" rx="5" class="site-building-shell"/>
+                <path d="M12 12 H80 M12 23 H80 M12 34 H80" class="site-building-detail"/>
+                <text x="46" y="28" text-anchor="middle" class="site-building-label">WASTE SKIP</text>
+              </g>
+
+              <!-- Main structure under construction -->
+              <g class="site-structure">
+                <rect x="365" y="86" width="270" height="130" rx="4" class="site-structure-shell"/>
+                <rect x="365" y="86" width="270" height="130" rx="4" fill="url(#concreteHatch)"/>
+                <path d="M455 86 V216 M545 86 V216 M365 151 H635" class="site-structure-lines"/>
+                <text x="500" y="143" text-anchor="middle" class="site-structure-title">BUILDING A</text>
+                <text x="500" y="162" text-anchor="middle" class="site-small-label">STRUCTURAL WORKS</text>
+              </g>
+              <g class="site-building">
+                <rect x="786" y="305" width="80" height="24" rx="4" class="site-building-shell"/>
+                <text x="826" y="321" text-anchor="middle" class="site-small-label">GENERATOR</text>
+              </g>
+              <g class="site-building site-assembly" transform="translate(400 535)">
+                <rect width="152" height="46" rx="6" class="site-assembly-shell"/>
+                <path d="M14 13 H138 M14 33 H138" class="site-assembly-line"/>
+                <text x="76" y="24" text-anchor="middle" class="site-assembly-label">ASSEMBLY POINT</text>
+                <text x="76" y="43" text-anchor="middle" class="site-small-label">EMERGENCY MUSTER</text>
+              </g>
+
+              <!-- Configured example zones; positions are schematic only -->
+              <g class="site-zone" data-zone-code="ZONE-A" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone A, excavation and trench area">
+                <path d="M108 330 H295 V465 H108 Z" class="site-zone-shape"/>
+                <path d="M120 354 H284 V450 H120 Z" fill="url(#soilHatch)" class="site-zone-detail"/>
+                <text x="124" y="350" class="site-zone-code">ZONE A</text>
+                <text x="124" y="376" class="site-zone-label">EXCAVATION</text>
+                <text x="124" y="394" class="site-zone-sub">TRENCH / EARTHWORKS</text>
+                <path d="M132 421 H268 M132 432 H268" class="site-zone-contour"/>
+              </g>
+              <g class="site-zone" data-zone-code="ZONE-B" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone B, high-voltage transformer bay">
+                <rect x="674" y="155" width="218" height="132" rx="8" class="site-zone-shape"/>
+                <rect x="692" y="197" width="182" height="70" rx="5" class="site-zone-detail"/>
+                <path d="M715 212 V252 M742 212 V252 M769 212 V252 M796 212 V252 M823 212 V252" class="site-equipment-line"/>
+                <text x="694" y="180" class="site-zone-code">ZONE B</text>
+                <text x="694" y="294" class="site-zone-sub">ELECTRICAL / RESTRICTED ACCESS</text>
+              </g>
+              <g class="site-zone" data-zone-code="ZONE-C" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone C, tower crane swing radius">
+                <circle cx="500" cy="358" r="112" class="site-zone-shape"/>
+                <circle cx="500" cy="358" r="84" class="site-zone-detail"/>
+                <path d="M500 358 V255 M500 358 L584 314 M500 358 L424 400" class="site-crane-line"/>
+                <circle cx="500" cy="358" r="8" class="site-crane-hub"/>
+                <text x="500" y="476" text-anchor="middle" class="site-zone-code">ZONE C · CRANE SWING AREA</text>
+              </g>
+              <g class="site-zone" data-zone-code="ZONE-D" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone D, elevated framing deck">
+                <path d="M105 155 H315 V285 H105 Z" class="site-zone-shape"/>
+                <path d="M125 180 H295 V260 H125 Z" class="site-zone-detail"/>
+                <path d="M125 180 L295 260 M295 180 L125 260 M210 180 V260 M125 220 H295" class="site-platform-lines"/>
+                <text x="124" y="174" class="site-zone-code">ZONE D</text>
+                <text x="210" y="279" text-anchor="middle" class="site-zone-sub">ELEVATED FRAMING DECK</text>
+              </g>
+              <g class="site-zone" data-zone-code="ZONE-E" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone E, hot-work and fuel storage bay">
+                <rect x="674" y="345" width="218" height="154" rx="8" class="site-zone-shape"/>
+                <path d="M694 390 H872 V478 H694 Z" class="site-zone-detail"/>
+                <path d="M750 390 V478 M812 390 V478 M694 434 H872" class="site-zone-grid"/>
+                <text x="694" y="372" class="site-zone-code">ZONE E</text>
+                <text x="694" y="523" class="site-zone-sub">HOT WORK / FUEL STORAGE</text>
+              </g>
+
+              <!-- North marker and drawing reference -->
+              <g transform="translate(928 75)" class="site-north">
+                <path d="M0 28 L10 0 L20 28 L10 22 Z"/>
+                <text x="10" y="44" text-anchor="middle">N</text>
+              </g>
+              <text x="806" y="596" class="site-drawing-note">SCHEMATIC · NOT TO SCALE</text>
+
+              <!-- Example sources are clickable, but do not imply live coverage -->
+              <g class="site-source-node" data-camera-id="cam1" tabindex="0" role="button" aria-label="Open local sample clip A">
+                <circle cx="325" cy="510" r="15" class="site-source-halo"/>
+                <circle cx="325" cy="510" r="7" class="site-source-dot"/>
+                <text x="325" y="540" text-anchor="middle" class="site-source-label">CLIP A</text>
+              </g>
+              <g class="site-source-node" data-camera-id="cam2" tabindex="0" role="button" aria-label="Open local sample clip B">
+                <circle cx="920" cy="320" r="15" class="site-source-halo"/>
+                <circle cx="920" cy="320" r="7" class="site-source-dot"/>
+                <text x="920" y="347" text-anchor="middle" class="site-source-label">CLIP B</text>
+              </g>
+              <g class="site-source-node" data-camera-id="webcam" tabindex="0" role="button" aria-label="Open local webcam after granting browser permission">
+                <circle cx="357" cy="248" r="15" class="site-webcam-halo"/>
+                <circle cx="357" cy="248" r="7" class="site-webcam-dot"/>
+                <text x="357" y="275" text-anchor="middle" class="site-source-label">WEBCAM</text>
+              </g>
+            </svg>
+          </div>
+          <div class="site-plan-footer">
+            <div class="site-risk-legend" aria-label="Configured zone risk colors">
+              <span><i class="site-risk-dot" data-risk-level="low"></i>Low</span>
+              <span><i class="site-risk-dot" data-risk-level="moderate"></i>Moderate</span>
+              <span><i class="site-risk-dot" data-risk-level="high"></i>High</span>
+              <span><i class="site-risk-dot" data-risk-level="critical"></i>Critical</span>
+              <span><i class="site-risk-dot" data-risk-level="catastrophic"></i>Catastrophic</span>
+            </div>
+            <span><i class="site-legend-dot facility-dot"></i> Example facility</span>
+            <span><i class="site-legend-dot source-dot"></i> Local demo input</span>
+          </div>
+        </div>
+
+        <aside class="site-map-sidebar">
+          <div class="card site-sidebar-card">
+            <div class="site-sidebar-heading">
+              <div>
+                <span class="site-map-kicker">FIELD REFERENCE</span>
+                <h2 class="text-base font-bold mt-1">Configured zones</h2>
+              </div>
+              <span class="site-zone-count" id="mapActiveZonesCount">0</span>
+            </div>
+            <p class="site-sidebar-note">Select a zone to locate it on the schematic. Risk levels are configured examples, not live conditions.</p>
+            <div id="mapZonesList" class="site-zone-list" aria-label="Configured zones">
+              <div class="text-sm italic" style="color:var(--muted)">Loading configured zones…</div>
+            </div>
+            <div id="mapZoneSelection" class="site-selection" aria-live="polite">Select a zone to highlight its approximate position.</div>
+          </div>
+
+          <div class="card site-sidebar-card">
+            <div class="site-sidebar-heading">
+              <div>
+                <span class="site-map-kicker">LOCAL INPUTS</span>
+                <h2 class="text-base font-bold mt-1">Demo sources</h2>
+              </div>
+              <span class="site-source-count">3 SOURCES</span>
+            </div>
+            <p class="site-sidebar-note">Open a local sample or request permission for your webcam. No site cameras are connected.</p>
+            <div class="site-source-list">
+              <button type="button" class="site-source-button" data-camera-id="cam1">
+                <span><i data-lucide="video" aria-hidden="true"></i><span>Sample clip A</span></span><span class="site-source-kind">LOCAL FILE</span>
+              </button>
+              <button type="button" class="site-source-button" data-camera-id="cam2">
+                <span><i data-lucide="video" aria-hidden="true"></i><span>Sample clip B</span></span><span class="site-source-kind">LOCAL FILE</span>
+              </button>
+              <button type="button" class="site-source-button" data-camera-id="webcam">
+                <span><i data-lucide="camera" aria-hidden="true"></i><span>Local webcam</span></span><span class="site-source-kind permission">PERMISSION</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===================== INCIDENT FOLLOW-UP ===================== -->
+    <section id="view-tickets" class="view">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <h1 class="text-xl font-bold mb-1">Incident follow-up</h1>
+          <p class="text-sm" style="color:var(--ink-2)">Record a site concern, track its status, and note the corrective action. This is a project workflow, not a compliance certification.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" class="btn-ghost font-mono text-xs py-1.5 px-3 flex items-center gap-1.5" id="btnRefreshTickets">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Tickets
+          </button>
+        </div>
+      </div>
+
+      <!-- Ticket Counter Chips -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4" id="ticketCounters">
+        <div class="chip"><span class="n" id="cntTotalTickets">0</span><span class="l">Total Incidents</span></div>
+        <div class="chip"><span class="n text-red-500" id="cntOpenTickets">0</span><span class="l">Open Tickets</span></div>
+        <div class="chip"><span class="n text-amber-500" id="cntInvestigatingTickets">0</span><span class="l">Under Investigation</span></div>
+        <div class="chip"><span class="n text-emerald-500" id="cntRemediatedTickets">0</span><span class="l">Remediated</span></div>
+      </div>
+
+      <form id="ticketForm" class="card p-4 mb-4">
+        <div class="flex flex-wrap items-start justify-between gap-2 mb-4">
+          <div>
+            <h2 class="font-semibold">Log an incident</h2>
+            <p class="text-xs mt-1" style="color:var(--ink-2)">Create a trackable record for a concern that needs review.</p>
+          </div>
+          <span class="feature-tag">MANUAL ENTRY</span>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="text-xs font-medium">Hazard type
+            <select class="btn-ghost w-full mt-1" name="hazard_type" required>
+              <option value="MISSING_PPE">Missing PPE</option>
+              <option value="FIRE_SMOKE_ALERT">Fire / smoke</option>
+              <option value="PROXIMITY_DANGER">Equipment proximity</option>
+              <option value="RESTRICTED_ZONE">Restricted zone</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </label>
+          <label class="text-xs font-medium">Severity
+            <select class="btn-ghost w-full mt-1" name="severity" required>
+              <option value="LOW">Low</option>
+              <option value="MODERATE">Moderate</option>
+              <option value="HIGH" selected>High</option>
+              <option value="CRITICAL">Critical</option>
+              <option value="CATASTROPHIC">Catastrophic</option>
+            </select>
+          </label>
+          <label class="text-xs font-medium">Zone / location
+            <input class="btn-ghost w-full mt-1" name="zone_name" maxlength="120" placeholder="e.g. North access road" required />
+          </label>
+          <label class="text-xs font-medium">What needs attention?
+            <input class="btn-ghost w-full mt-1" name="description" maxlength="1000" placeholder="Describe what was observed and the next step" required />
+          </label>
+        </div>
+        <div class="mt-4 grid gap-2">
+          <label class="inline-flex items-center gap-2 text-xs font-medium">
+            <input type="checkbox" id="attachTicketEvidence" />
+            Attach one evidence image to this incident
+          </label>
+          <input class="btn-ghost w-full max-w-lg text-xs" type="file" name="evidence_upload"
+            id="ticketEvidenceUpload" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" disabled />
+          <p class="text-xs" style="color:var(--muted)">Optional JPG, PNG, or WebP up to 10 MB. Image is retained only when selected and attached. Review AI findings before saving.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 mt-4">
+          <button class="btn-primary" id="btnCreateTicket" type="submit"><i data-lucide="plus" class="w-4 h-4"></i>Save incident</button>
+          <span id="ticketFormMsg" class="text-sm" role="status" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <!-- Filter Tabs -->
+      <div class="flex flex-wrap items-center gap-2 mb-4" id="ticketFilterButtons">
+        <button type="button" class="btn-ghost text-xs py-1 px-3 active font-medium" data-ticket-filter="ALL">All Tickets</button>
+        <button type="button" class="btn-ghost text-xs py-1 px-3 font-medium" data-ticket-filter="OPEN">Open Only</button>
+        <button type="button" class="btn-ghost text-xs py-1 px-3 font-medium" data-ticket-filter="INVESTIGATING">Under Investigation</button>
+        <button type="button" class="btn-ghost text-xs py-1 px-3 font-medium" data-ticket-filter="REMEDIATED">Remediated</button>
+      </div>
+
+      <!-- Tickets Board / Table -->
+      <div class="card p-4 overflow-x-auto">
+        <table class="data text-xs" id="ticketsTable">
+          <thead>
+            <tr>
+              <th>Ticket ID</th>
+              <th>Date &amp; Time</th>
+              <th>Hazard Type</th>
+              <th>Severity</th>
+              <th>Zone / Location</th>
+              <th>Evidence</th>
+              <th>Status</th>
+              <th>Supervisor Action</th>
+            </tr>
+          </thead>
+          <tbody id="ticketsTbody">
+            <tr><td colspan="8" class="text-center p-4 italic" style="color:var(--muted)">Loading incident tickets...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== AREA ENVIRONMENT ===================== -->
+    <section id="view-air-quality" class="view">
+      <div class="air-quality-heading">
+        <div>
+          <span class="site-map-kicker">ENVIRONMENT / AREA CONDITIONS</span>
+          <h1 class="text-2xl font-bold mt-1 mb-1">Air quality &amp; weather</h1>
+          <p class="text-sm" style="color:var(--ink-2)">Choose an Indian state and district or city to view regional model conditions.</p>
+        </div>
+        <button class="btn-ghost" type="button" id="refreshAirQuality"><i data-lucide="refresh-cw" class="w-4 h-4"></i>Refresh area data</button>
+      </div>
+      <div class="air-quality-disclosure" role="note">
+        <i data-lucide="info" class="w-4 h-4"></i>
+        <p><strong>REGIONAL MODEL ESTIMATE · NOT A CPCB STATION READING.</strong> Air quality and weather come from Open-Meteo's CAMS and weather models (air-quality grid is approximately 45 km). The US AQI value is a regional estimate, not a district monitor or construction-site sensor. The separate construction scenario is a configurable, unvalidated what-if calculation—not a forecast, measurement, official AQI, or safety/health advice.</p>
+      </div>
+      <form id="environmentLocationForm" class="card environment-location-form">
+        <label for="environmentState">State / union territory</label>
+        <select id="environmentState" required aria-label="State or union territory">
+          <option value="Delhi">Delhi</option>
+        </select>
+        <label for="environmentDistrict">District or city</label>
+        <input id="environmentDistrict" type="search" value="New Delhi" maxlength="80" autocomplete="off" placeholder="e.g. Mysuru" required />
+        <button class="btn-ghost" type="submit" id="findEnvironmentLocations"><i data-lucide="search" class="w-4 h-4"></i>Find area</button>
+        <label for="environmentLocationSelect">Matching locations</label>
+        <select id="environmentLocationSelect" aria-label="Matching district or city">
+          <option value="">Search for a district or city</option>
+        </select>
+        <button class="btn-primary" type="button" id="loadEnvironmentLocation" disabled><i data-lucide="map-pin" class="w-4 h-4"></i>Load selected area</button>
+      </form>
+      <p class="air-quality-location"><i data-lucide="map-pin" class="w-4 h-4"></i><span id="airQualityLocation">Delhi · New Delhi</span><span class="feature-tag">REGIONAL MODEL</span></p>
+      <div class="air-quality-summary">
+        <article class="card air-quality-main-card" id="airQualityMainCard" data-category="unavailable">
+          <div class="air-quality-card-heading">
+            <div><span class="site-map-kicker">DISTRICT-AREA MODEL</span><h2 class="font-semibold mt-1">Air quality now</h2></div>
+            <span class="hud-pill info" id="airQualityCategory">Select an area</span>
+          </div>
+          <div class="air-quality-index-row">
+            <div class="air-quality-gauge" id="airQualityGauge" role="img" aria-label="Regional modeled air quality index">
+              <div><strong id="airQualityIndex">—</strong><span>US AQI</span></div>
+            </div>
+            <div class="air-quality-index-details">
+              <div><span>PM2.5</span><strong id="ambientPm25">—</strong></div>
+              <div><span>PM10</span><strong id="ambientPm10">—</strong></div>
+              <div><span>Model update</span><strong id="airQualityTimestamp">—</strong></div>
+            </div>
+          </div>
+        </article>
+        <article class="card air-quality-weather-card">
+          <div class="air-quality-card-heading">
+            <div><span class="site-map-kicker">WEATHER MODEL</span><h2 class="font-semibold mt-1">Current conditions</h2></div>
+            <span class="hud-pill info" id="weatherUpdatedAt">—</span>
+          </div>
+          <div class="weather-metrics">
+            <div><span>Conditions</span><strong id="weatherCondition">—</strong></div>
+            <div><span>Temperature</span><strong id="weatherTemperature">—</strong></div>
+            <div><span>Feels like</span><strong id="weatherApparentTemperature">—</strong></div>
+            <div><span>Humidity</span><strong id="weatherHumidity">—</strong></div>
+            <div><span>Wind</span><strong id="weatherWind">—</strong></div>
+            <div><span>Precipitation</span><strong id="weatherPrecipitation">—</strong></div>
+          </div>
+          <div id="weatherForecast" class="weather-forecast" aria-label="Three-day forecast"></div>
+        </article>
+      </div>
+      <div class="air-quality-pollutants">
+        <article class="card p-4">
+          <div class="air-quality-card-heading mb-3">
+            <div><span class="site-map-kicker">MODELED PARTICULATES</span><h2 class="font-semibold mt-1">Next 12 hours</h2></div>
+            <span class="feature-tag">HOURLY MODEL</span>
+          </div>
+          <div class="air-quality-chart-wrap"><canvas id="chartAirQuality" aria-label="Modeled hourly PM2.5 and PM10 trend" role="img"></canvas></div>
+          <p class="text-[10px] mt-2" style="color:var(--ink-2)">Forward-looking regional model values; not site observations.</p>
+        </article>
+        <article class="card construction-scenario-card" id="constructionScenarioCard">
+          <div class="air-quality-card-heading">
+            <div><span class="site-map-kicker">SEPARATE FROM AREA DATA</span><h2 class="font-semibold mt-1">Construction-site what-if</h2></div>
+            <span class="hud-pill warn">SCENARIO ONLY</span>
+          </div>
+          <div class="scenario-controls">
+            <label for="scenarioActivity">Construction activity</label>
+            <select id="scenarioActivity">
+              <option value="light">Light work</option>
+              <option value="typical" selected>Typical activity</option>
+              <option value="dust_intensive">Dust-intensive activity</option>
+            </select>
+            <label for="scenarioMitigation">Dust controls</label>
+            <select id="scenarioMitigation">
+              <option value="none">No additional controls</option>
+              <option value="basic" selected>Basic suppression / covered loads</option>
+              <option value="strong">Enhanced dust controls</option>
+            </select>
+          </div>
+          <div class="scenario-index">
+            <div><span class="stat-label">Illustrative PM-only index</span><strong id="scenarioIndex">—</strong></div>
+            <span class="hud-pill info" id="scenarioCategory">Waiting for area data</span>
+          </div>
+          <p id="scenarioParticulates" class="scenario-particulates">Select an area to calculate a what-if.</p>
+          <p id="scenarioWeatherContext" class="scenario-weather-context">Weather context appears when an area is loaded.</p>
+          <p class="scenario-assumptions">Assumed PM2.5/PM10 additions before controls (µg/m³): light +4/+10, typical +12/+35, dust-intensive +30/+90. Assumed reductions: none 0%, basic 35%, enhanced 60%. These project-defined values are not calibrated. CPCB PM breakpoints are used only to illustrate relative change; this is not an official CPCB AQI, emissions model, exposure estimate, or forecast.</p>
+        </article>
+        <aside class="card air-quality-method-card">
+          <span class="site-map-kicker">SOURCES &amp; LIMITATIONS</span>
+          <h2 class="font-semibold mt-1 mb-3">What these values mean</h2>
+          <ol>
+            <li>State and locality results are matched with Open-Meteo geocoding.</li>
+            <li>Air quality uses Open-Meteo's CAMS global atmospheric composition model; weather uses its forecast models.</li>
+            <li>The shown AQI is the model provider's <strong>US AQI</strong>, not the Indian CPCB scale.</li>
+          </ol>
+          <p>Open-Meteo regional model resolution is approximately 45 km for air quality, so it cannot resolve a district boundary or construction-site conditions. AQI depends on pollutant averaging and model uncertainty. Use official local advisories and onsite instruments for decisions.</p>
+          <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo data &amp; attribution <i data-lucide="external-link" class="w-3 h-3"></i></a>
+          <p id="airQualityMessage" class="text-xs mt-3" role="status" aria-live="polite"></p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="view-dashboard" class="view">
+      <h1 class="text-xl font-bold mb-1">Project overview</h1>
+      <p class="text-sm mb-4" style="color:var(--ink-2)">Saved inspection history, incident follow-up, and planned work progress.</p>
+
+      <!-- Ticket-based project risk summary -->
+      <div class="card p-4 mb-5 border-l-4 border-l-emerald-500" id="oshaRiskCard">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="text-xs uppercase font-mono tracking-wider" style="color:var(--ink-2)">Ticket-based risk indicator</div>
+            <div class="flex items-center gap-3">
+              <span class="text-3xl font-bold font-mono" id="dashRiskScore">—</span>
+              <span class="hud-pill info" id="dashRiskRating">NO TICKET DATA YET</span>
+            </div>
+            <p class="text-xs" style="color:var(--ink-2)">A project-defined score based only on open and investigating incident tickets. It is not an OSHA score or a live hazard assessment.</p>
+          </div>
+          <div class="flex flex-wrap gap-2 text-xs font-mono">
+            <div class="px-3 py-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div class="text-[10px]" style="color:var(--ink-2)">Catastrophic</div>
+              <div class="font-bold text-red-500" id="dashRiskCatastrophic">0</div>
+            </div>
+            <div class="px-3 py-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-center">
+                <div class="text-[10px]" style="color:var(--ink-2)">High</div>
+                <div class="font-bold text-orange-500" id="dashRiskHigh">0</div>
+              </div>
+              <div class="px-3 py-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div class="text-[10px]" style="color:var(--ink-2)">Critical</div>
+              <div class="font-bold text-amber-500" id="dashRiskCritical">0</div>
+            </div>
+            <div class="px-3 py-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div class="text-[10px]" style="color:var(--ink-2)">Remediated</div>
+              <div class="font-bold text-emerald-500" id="dashRiskRemediated">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5" id="kpis">
+        <!-- KPI tiles injected -->
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-4 mb-4">
+        <article class="card p-4">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <h2 class="font-semibold text-sm">Area air quality &amp; weather</h2>
+              <p class="text-[10px] font-mono font-bold text-amber-600 mt-1">REGIONAL MODEL · NOT A SITE SENSOR</p>
+            </div>
+            <span class="hud-pill info text-[10px]">US AQI model</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="environmentReadings">
+            <span class="text-sm" style="color:var(--ink-2)">Choose a district or city in the air-quality view to load regional conditions.</span>
+          </div>
+          <div class="environment-aqi-panel mt-3" id="environmentAqi" role="group" aria-label="Simulated PM-only CPCB index">
+            <div class="environment-aqi-reading">
+              <span class="stat-label">Area US AQI</span>
+              <strong id="environmentAqiValue">—</strong>
+              <span id="environmentAqiCategory">No area selected</span>
+            </div>
+            <p class="environment-aqi-note"><span class="font-semibold">MODEL ESTIMATE</span> — Regional model output, not a local monitor or site sensor. <span id="environmentTimestamp">—</span></p>
+            <button class="btn-ghost text-xs air-quality-open" type="button" data-view="air-quality">Choose area / view weather <i data-lucide="arrow-right" class="w-3 h-3"></i></button>
+          </div>
+        </article>
+        <article class="card p-4">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <h2 class="font-semibold text-sm">Pre-shift readiness</h2>
+              <p class="text-xs mt-1" style="color:var(--ink-2)">Daily start-of-shift checks, saved for today.</p>
+            </div>
+            <span class="hud-pill info" id="preShiftSummary">Not recorded</span>
+          </div>
+          <form id="preShiftForm" class="grid sm:grid-cols-2 gap-2 text-sm">
+            <label class="flex items-center gap-2"><input type="checkbox" name="headcount_ready"> Headcount accounted for</label>
+            <label class="flex items-center gap-2"><input type="checkbox" name="toolbox_talk"> Toolbox talk completed</label>
+            <label class="flex items-center gap-2"><input type="checkbox" name="ppe_inspected"> PPE inspected</label>
+            <label class="flex items-center gap-2"><input type="checkbox" name="equipment_checked"> Equipment pre-start checked</label>
+            <label class="flex items-center gap-2"><input type="checkbox" name="access_clear"> Emergency access clear</label>
+            <label class="text-xs">Checked by (optional employee ID)
+              <input class="btn-ghost w-full mt-1" name="checked_by" maxlength="32" autocomplete="off">
+            </label>
+            <button class="btn-primary sm:col-span-2 justify-center" type="submit">Save today's readiness check</button>
+          </form>
+          <p id="preShiftMessage" class="text-xs mt-2" role="status" aria-live="polite"></p>
+        </article>
+      </div>
+
+      <article class="card p-4 mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="font-semibold text-sm">Today's worker check-ins</h2>
+            <p class="text-xs mt-1" style="color:var(--ink-2)">Only employee ID, time, status, and text findings are retained. Photos are not saved. Confirm a flagged concern only after an in-person check.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono" id="attendanceSummary">Loading...</span>
+            <button class="btn-ghost text-xs" type="button" data-view="attendance">Open check-in</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto mt-3">
+          <table class="data text-xs">
+            <thead><tr><th>Employee ID</th><th>Time</th><th>Screening status</th><th>Text findings</th><th>Supervisor action</th></tr></thead>
+            <tbody id="attendanceTbody"><tr><td colspan="5" class="text-center p-3">Loading check-ins...</td></tr></tbody>
+          </table>
+        </div>
+        <p id="attendanceActionStatus" class="text-xs mt-2" role="status" aria-live="polite"></p>
+      </article>
+
+      <dialog id="attendanceConfirmDialog" class="site-confirm-dialog">
+        <form id="attendanceConfirmForm" class="space-y-4">
+          <div>
+            <span class="site-map-kicker">SUPERVISOR REVIEW</span>
+            <h2 class="text-lg font-bold mt-1">Confirm PPE concern</h2>
+            <p id="attendanceConfirmDetails" class="text-sm mt-2" style="color:var(--ink-2)"></p>
+          </div>
+          <label class="site-confirm-check">
+            <input id="attendancePhysicallyVerified" type="checkbox" required>
+            <span>I have checked this worker in person and confirmed a PPE concern.</span>
+          </label>
+          <label class="block text-sm font-medium">Supervisor name
+            <input id="attendanceSupervisorName" class="btn-ghost w-full mt-1" required maxlength="80" autocomplete="name">
+          </label>
+          <p class="text-xs" style="color:var(--muted)">The typed name is an audit note, not authenticated identity. The check-in photo is not attached or retained.</p>
+          <p id="attendanceConfirmMessage" class="text-sm" role="status" aria-live="polite"></p>
+          <div class="flex justify-end gap-2">
+            <button type="button" class="btn-ghost" id="attendanceConfirmCancel">Cancel</button>
+            <button type="submit" class="btn-primary" id="attendanceConfirmSubmit">Create follow-up ticket</button>
+          </div>
+          <input id="attendanceConfirmEmployeeId" type="hidden">
+          <input id="attendanceConfirmDate" type="hidden">
+        </form>
+      </dialog>
+
+      <div class="grid md:grid-cols-3 gap-4 mb-4">
+        <div class="card p-4 md:col-span-2">
+          <h2 class="font-semibold mb-3 text-sm">PPE results over saved checks</h2>
+          <canvas id="chartCompliance" height="120"></canvas>
+        </div>
+        <div class="card p-4">
+          <h2 class="font-semibold mb-3 text-sm">Helmet vs violations</h2>
+          <canvas id="chartDonut" height="120"></canvas>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="card p-4">
+          <h2 class="font-semibold mb-3 text-sm flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4"></i>Recent photo findings</h2>
+          <div id="alerts" class="space-y-2 text-sm"></div>
+        </div>
+        <div class="card p-4">
+          <h2 class="font-semibold mb-3 text-sm flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>Project progress</h2>
+          <div id="dashProgress" class="text-sm"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== WORKER CHECK-IN ===================== -->
+    <section id="view-attendance" class="view">
+      <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+        <div>
+          <p class="text-[10px] font-mono tracking-widest uppercase" style="color:var(--orange)">Worker entry / PPE screening</p>
+          <h1 class="text-xl font-bold mb-1">Worker check-in</h1>
+          <p class="text-sm" style="color:var(--ink-2)">Enter an employee ID, capture or upload a photo, then review the model's PPE flags with a supervisor.</p>
+        </div>
+        <span class="hud-pill warn">AI result is not identity verification</span>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-4">
+        <article class="card p-4">
+          <form id="attendanceForm" class="space-y-4">
+            <label class="block text-sm font-medium">Employee ID
+              <input id="attendanceEmployeeId" name="employee_id" class="btn-ghost w-full mt-1" required maxlength="32" pattern="[A-Za-z0-9_\-]{1,32}" autocomplete="off" placeholder="e.g. EMP-012">
+            </label>
+            <div class="flex flex-wrap gap-2">
+              <button class="btn-ghost" id="attendanceStartCamera" type="button"><i data-lucide="camera" class="w-4 h-4"></i>Use camera</button>
+              <button class="btn-ghost" id="attendanceCapture" type="button" disabled><i data-lucide="scan" class="w-4 h-4"></i>Capture photo</button>
+              <label class="btn-ghost cursor-pointer"><i data-lucide="upload" class="w-4 h-4"></i>Upload photo
+                <input id="attendanceUpload" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" class="sr-only">
+              </label>
+            </div>
+            <div id="attendanceCameraWrap" class="hidden">
+              <video id="attendanceVideo" class="w-full max-h-80 rounded-lg bg-black object-contain" autoplay playsinline></video>
+              <canvas id="attendanceCanvas" class="hidden"></canvas>
+              <p class="text-xs mt-2" style="color:var(--ink-2)">Camera stays in this browser and stops after capture or when you leave this page.</p>
+            </div>
+            <p id="attendanceFileName" class="text-xs" style="color:var(--ink-2)">No photo selected.</p>
+            <button class="btn-primary" id="attendanceSubmit" type="submit"><i data-lucide="scan-search" class="w-4 h-4"></i>Screen and record check-in</button>
+            <p id="attendanceMessage" class="text-sm" role="status" aria-live="polite"></p>
+          </form>
+          <div class="mt-4 border-t pt-3 text-xs space-y-1" style="border-color:var(--border);color:var(--ink-2)">
+            <p><strong>Photo handling:</strong> processed temporarily in memory; not saved to the database or files. The annotated preview is temporary and can be cleared.</p>
+            <p><strong>Safety limitation:</strong> automated detection can miss or mislabel PPE. A supervisor must verify every result in person.</p>
+          </div>
+        </article>
+
+        <article class="card p-4">
+          <div class="flex items-center justify-between gap-3 mb-3">
+            <h2 class="font-semibold text-sm">Screening result</h2>
+            <button class="btn-ghost text-xs" id="attendanceClear" type="button">Clear temporary photo</button>
+          </div>
+          <div id="attendanceResult" class="text-sm" style="color:var(--ink-2)">No screening run yet.</div>
+          <img id="attendanceAnnotated" class="hidden w-full rounded-lg mt-3" alt="Temporary annotated PPE screening result">
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================== SAFETY DETECTION ===================== -->
+    <section id="view-detect" class="view">
+      <h1 class="text-xl font-bold mb-1">Safety Detection</h1>
+      <p class="text-sm mb-4" style="color:var(--ink-2)">Analyze site photos for helmet safety or people entering a restricted area.</p>
+
+      <label class="text-sm font-medium flex flex-wrap items-center gap-3 mb-5">
+        <span>Detection mode</span>
+        <select id="detectMode" class="btn-ghost">
+          <option value="helmet">Helmet Detection</option>
+          <option value="zone">Restricted-Zone Detection</option>
+        </select>
+      </label>
+
+      <div id="helmetModePanel" class="grid md:grid-cols-2 gap-4">
+        <div class="card p-4">
+          <div id="dropDetect" class="dropzone">
+            <div id="dropDetectPrompt">
+              <i data-lucide="image-plus" class="mx-auto mb-2"></i>
+              <div>Drop a photo here or <span style="color:var(--orange)">browse</span></div>
+            </div>
+            <img id="detectPreview" class="dz-preview hidden" alt="Selected photo" />
+            <div id="detectFileName" class="dz-filename hidden"></div>
+            <input type="file" id="fileDetect" accept="image/*" class="hidden" />
+          </div>
+
+          <div class="mt-4">
+            <label class="text-sm font-medium flex justify-between">
+              <span>Detection sensitivity</span>
+              <span id="confVal" style="color:var(--ink-2)">0.35</span>
+            </label>
+            <input type="range" id="conf" min="0.10" max="0.75" step="0.05" value="0.35" class="w-full" />
+            <p class="text-xs" style="color:var(--muted)">Lower = catch more (risk false alarms). Higher = stricter.</p>
+          </div>
+
+          <div class="mt-4 flex gap-2">
+            <button class="btn-primary" id="btnDetect" disabled><i data-lucide="scan-search" class="w-4 h-4"></i>Analyze photo</button>
+            <button class="btn-ghost" id="btnSaveDetect" disabled><i data-lucide="save" class="w-4 h-4"></i>Save to log</button>
+          </div>
+          <div id="detectMsg" class="text-sm mt-3"></div>
+        </div>
+
+        <div class="card p-4">
+          <h2 class="font-semibold mb-3 text-sm">Result</h2>
+          <div id="detectResult" class="text-sm" style="color:var(--ink-2)">No photo analysed yet.</div>
+        </div>
+      </div>
+
+      <div id="zoneModePanel" class="grid md:grid-cols-2 gap-4 hidden">
+        <div class="card p-4">
+          <input type="file" id="fileZone" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="hidden" />
+          <button type="button" id="chooseZoneImage" class="btn-ghost mb-3">
+            <i data-lucide="image-plus" class="w-4 h-4"></i>Choose site image
+          </button>
+          <span id="zoneFileName" class="text-xs ml-2" style="color:var(--ink-2)"></span>
+          <p class="text-xs mb-3" style="color:var(--ink-2)">
+            Click at least 3 points on the image to outline the restricted area. Click the first point again or choose Finish polygon to close it. The zone uses original image coordinates.
+          </p>
+          <div id="zoneCanvasWrap" class="zone-canvas-wrap hidden">
+            <img id="zoneImage" alt="Selected construction site for restricted-zone drawing" />
+            <canvas id="zoneCanvas" class="zone-canvas" aria-label="Click to draw the restricted-zone polygon"></canvas>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button type="button" class="btn-ghost" id="finishZone" disabled>Finish polygon</button>
+            <button type="button" class="btn-ghost" id="clearZone" disabled>Clear / redraw</button>
+          </div>
+          <div class="mt-4">
+            <label class="text-sm font-medium flex justify-between">
+              <span>Person-detection confidence</span>
+              <span id="zoneConfVal" style="color:var(--ink-2)">0.35</span>
+            </label>
+            <input type="range" id="zoneConf" min="0.10" max="0.75" step="0.05" value="0.35" class="w-full" />
+            <p class="text-xs" style="color:var(--muted)">Lower values detect more people but may add false detections.</p>
+          </div>
+          <button type="button" class="btn-primary mt-4" id="analyzeZone" disabled>
+            <i data-lucide="scan-search" class="w-4 h-4"></i>Analyze restricted zone
+          </button>
+          <div id="zoneMsg" class="text-sm mt-3" role="status"></div>
+        </div>
+        <div class="card p-4">
+          <h2 class="font-semibold mb-3 text-sm">Restricted-zone result</h2>
+          <div id="zoneResult" class="text-sm" style="color:var(--ink-2)">Choose an image, draw a zone, and analyze it.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== VIDEO DETECTION ===================== -->
+    <section id="view-video" class="view">
+      <h1 class="text-xl font-bold mb-1">Video Detection</h1>
+      <p class="text-sm mb-5" style="color:var(--ink-2)">
+        Upload a short site clip — the AI checks helmets frame by frame.
+        <span style="color:var(--muted)">Runs on CPU, so processing a clip takes a little time.</span>
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="card p-4">
+          <div id="dropVideo" class="dropzone">
+            <div id="dropVideoPrompt">
+              <i data-lucide="film" class="mx-auto mb-2"></i>
+              <div>Drop a video here or <span style="color:var(--orange)">browse</span></div>
+            </div>
+            <video id="videoPreview" class="dz-preview hidden" muted playsinline preload="metadata"></video>
+            <div id="videoFileName" class="dz-filename hidden"></div>
+            <input type="file" id="fileVideo" accept="video/*" class="hidden" />
+          </div>
+
+          <div class="mt-4">
+            <label class="text-sm font-medium flex justify-between">
+              <span>Analyse every Nth frame</span>
+              <span id="sampleVal" style="color:var(--ink-2)">5</span>
+            </label>
+            <input type="range" id="sample" min="1" max="15" step="1" value="5" class="w-full" />
+            <p class="text-xs" style="color:var(--muted)">Higher = faster but coarser. 5 is a good balance.</p>
+          </div>
+
+          <button class="btn-primary mt-4" id="btnVideo" disabled><i data-lucide="play" class="w-4 h-4"></i>Analyze video</button>
+          <div id="videoMsg" class="text-sm mt-3"></div>
+        </div>
+
+        <div class="card p-4">
+          <h2 class="font-semibold mb-3 text-sm">Annotated result</h2>
+          <div id="videoResult" class="text-sm" style="color:var(--ink-2)">No video analysed yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== INCIDENT LOG ===================== -->
+    <section id="view-log" class="view">
+      <h1 class="text-xl font-bold mb-1">Incident Log</h1>
+      <p class="text-sm mb-5" style="color:var(--ink-2)">Every saved safety check, newest first.</p>
+      <div class="card p-4 overflow-x-auto">
+        <table class="data" id="logTable"><thead></thead><tbody></tbody></table>
+        <div id="logEmpty" class="text-sm hidden" style="color:var(--ink-2)">No inspections saved yet.</div>
+      </div>
+      <div class="card p-4 mt-4">
+        <h2 class="font-semibold mb-3 text-sm">Saved detection image</h2>
+        <select id="logImageSelect" class="btn-ghost mb-3"></select>
+        <div id="logImageView"></div>
+      </div>
+    </section>
+
+    <!-- ===================== PROGRESS TRACKER ===================== -->
+    <section id="view-tracker" class="view">
+      <div class="flex items-center justify-between mb-1">
+        <h1 class="text-xl font-bold">Progress Tracker</h1>
+        <div class="flex gap-2">
+          <button class="btn-ghost" id="btnSample"><i data-lucide="download" class="w-4 h-4"></i>Load sample project</button>
+          <button class="btn-ghost" id="btnClearTasks"><i data-lucide="trash-2" class="w-4 h-4"></i>Clear all</button>
+        </div>
+      </div>
+      <p class="text-sm mb-5" style="color:var(--ink-2)">Track construction tasks against their planned schedule.</p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5" id="taskKpis"></div>
+
+      <div class="card p-4 mb-4">
+        <h2 class="font-semibold mb-3 text-sm">Add a task</h2>
+        <form id="taskForm" class="grid md:grid-cols-5 gap-2 items-end">
+          <div class="md:col-span-2">
+            <label class="text-xs" style="color:var(--ink-2)">Task name</label>
+            <input name="name" required class="btn-ghost w-full" placeholder="e.g. Foundation Work" />
+          </div>
+          <div><label class="text-xs" style="color:var(--ink-2)">Start</label><input type="date" name="start_date" required class="btn-ghost w-full" /></div>
+          <div><label class="text-xs" style="color:var(--ink-2)">Planned end</label><input type="date" name="end_date" required class="btn-ghost w-full" /></div>
+          <div><label class="text-xs" style="color:var(--ink-2)">% done</label><input type="number" name="progress" min="0" max="100" value="0" class="btn-ghost w-full" /></div>
+          <div class="md:col-span-5 flex flex-wrap gap-2">
+            <button class="btn-primary justify-center" id="taskSubmit" type="submit"><i data-lucide="plus" class="w-4 h-4"></i>Add task</button>
+            <button class="btn-ghost hidden" id="cancelTaskEdit" type="button">Cancel edit</button>
+          </div>
+        </form>
+        <div id="taskMsg" class="text-sm mt-3" role="status"></div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div class="card p-4"><h2 class="font-semibold mb-3 text-sm">Completion by task</h2><canvas id="chartTasks" height="160"></canvas></div>
+        <div class="card p-4"><h2 class="font-semibold mb-3 text-sm">Schedule timeline</h2><div id="gantt" class="text-sm"></div></div>
+      </div>
+
+      <div class="card p-4 overflow-x-auto">
+        <table class="data" id="taskTable"><thead></thead><tbody></tbody></table>
+        <div id="taskEmpty" class="text-sm hidden" style="color:var(--ink-2)">No tasks yet. Add one above or load the sample project.</div>
+      </div>
+    </section>
+
+    <!-- ===================== REPORTS ===================== -->
+    <section id="view-reports" class="view">
+      <h1 class="text-xl font-bold mb-1">Reports</h1>
+      <p class="text-sm mb-5" style="color:var(--ink-2)">Export a project summary PDF. It is not an official OSHA or ISO audit.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5" id="reportKpis"></div>
+      <div class="card p-5">
+        <p class="text-sm mb-4">The PDF bundles the summary statistics, the full inspection log, the project schedule status, and (optionally) the most recent detection images — ready to print or share on site.</p>
+        <label class="flex items-center gap-2 text-sm mb-4">
+          <input type="checkbox" id="inclImages" checked /> Include recent detection images in the PDF
+        </label>
+        <a class="btn-primary" id="btnReport"><i data-lucide="download" class="w-4 h-4"></i>Download project summary (PDF)</a>
+        <div id="reportMsg" class="text-sm mt-3" role="status"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script defer src="/js/app.js?v=v21-authentication"></script>
+</body>
+</html>
