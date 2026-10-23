@@ -85,6 +85,7 @@ Python package versions are pinned in `requirements.txt`; frontend build package
 - [x] Main app workflows and SQLite storage.
 - [x] Admin/supervisor/viewer account roles.
 - [x] 61 automated tests passed on 2026-10-23.
+- [x] Source-only checkout test run passed; 4 tests requiring unbundled model weights are skipped.
 - [x] Python compilation and JavaScript syntax checks passed.
 - [x] Browser-tested account setup, login, account creation, and logout.
 - [ ] Run the CI workflow on GitHub.

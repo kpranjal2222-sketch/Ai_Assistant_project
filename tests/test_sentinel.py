@@ -64,7 +64,20 @@ class TestSentinel(unittest.TestCase):
         sentinel = SiteSentinel()
         # Synthetic frame (300 x 400 BGR)
         frame = np.full((300, 400, 3), 40, dtype=np.uint8)
-        annotated, telemetry = sentinel.process_frame(frame, conf=0.35, save_evidence=False)
+        summary = {
+            "ppe": {"detections": [], "falls_detected": 0},
+            "fire_smoke": {"tier": "CLEAR"},
+            "machinery_hazards": [],
+            "total_violations": 0,
+            "overall_severity": "CLEAR",
+        }
+        with patch(
+            "app.sentinel.detect_multi_hazards",
+            return_value=(Image.fromarray(frame[:, :, ::-1]), summary),
+        ):
+            annotated, telemetry = sentinel.process_frame(
+                frame, conf=0.35, save_evidence=False
+            )
 
         self.assertEqual(annotated.shape, frame.shape)
         self.assertIn("fps", telemetry)

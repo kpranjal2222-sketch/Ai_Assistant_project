@@ -45,6 +45,8 @@ Open <http://localhost:8000>. Data is stored locally in SQLite and under `data/`
 
 This source repository does not include AI model weights or sample photos/videos. Provide the model files separately and only when you have permission. Without model files, AI review endpoints cannot run; without sample videos, bundled video examples are unavailable.
 
+The test suite runs without those assets; model-dependent accuracy checks are skipped when model files are absent.
+
 ## Check the project
 
 ```powershell

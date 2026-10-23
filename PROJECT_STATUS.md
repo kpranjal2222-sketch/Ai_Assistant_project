@@ -16,6 +16,7 @@ SiteSentinel is a working **local construction-safety review app** built with Fa
 - [x] Administrator, supervisor, and read-only viewer accounts.
 - [x] First-admin setup, password hashing, login/logout, expiring sessions, and account management.
 - [x] 61 automated tests passed; Python and JavaScript syntax checks passed.
+- [x] The 61-test suite also passes from a source-only checkout without model/media assets; 4 model-dependent tests skip with an explanation.
 - [x] Windows/Python 3.11 GitHub Actions workflow added; it still needs a run on GitHub.
 
 ## Still to do

@@ -15,6 +15,7 @@ Use this file to continue the project in a new chat.
 - Features: safety review, incidents, worker check-in, tasks, pre-shift checklist, AQI/weather, site map, PDF report, and user accounts.
 - Roles: administrator (manage app and accounts), supervisor (manage project work), viewer (read-only).
 - Authentication tests, full app tests, JavaScript syntax check, and Python compilation passed on 2026-10-23.
+- The 61-test suite also passes in a source-only snapshot without private model/media files; 4 model-inference checks skip because those assets are intentionally not published.
 - A Windows/Python 3.11 CI workflow exists but has not yet run on GitHub.
 
 ## Remaining work

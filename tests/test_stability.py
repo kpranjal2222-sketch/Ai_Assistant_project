@@ -635,7 +635,11 @@ class StabilityTests(unittest.TestCase):
 
     def test_empty_database_health_and_pdf(self):
         health = self.client.get("/api/health")
-        self.assertEqual(health.status_code, 200)
+        if api.MODEL_PATH.is_file():
+            self.assertEqual(health.status_code, 200)
+        else:
+            self.assertEqual(health.status_code, 503)
+            self.assertIn("model file is missing", health.json()["detail"])
         pdf = self.client.get("/api/report.pdf")
         self.assertEqual(pdf.status_code, 200)
         self.assertEqual(pdf.headers["content-type"], "application/pdf")
