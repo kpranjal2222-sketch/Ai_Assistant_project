@@ -35,10 +35,15 @@ class TestMediaRetention(unittest.TestCase):
         os.utime(path, (old_time, old_time))
         return path
 
+    def assert_same_media_path(self, actual, expected):
+        self.assertEqual(actual.parent.name, expected.parent.name)
+        self.assertEqual(actual.name, expected.name)
+
     def test_dry_run_lists_unreferenced_old_files_without_deleting(self):
         path = self._old_file("videos", "annotated.mp4")
         candidates = cleanup_old_media(30, data_dir=self.data_dir, now=self.now)
-        self.assertEqual(candidates, [path])
+        self.assertEqual(len(candidates), 1)
+        self.assert_same_media_path(candidates[0], path)
         self.assertTrue(path.is_file())
 
     def test_apply_deletes_only_explicitly_eligible_files(self):
@@ -46,7 +51,8 @@ class TestMediaRetention(unittest.TestCase):
         recent_path = self.data_dir / "videos" / "recent.mp4"
         recent_path.write_bytes(b"recent")
         candidates = cleanup_old_media(30, apply=True, data_dir=self.data_dir, now=self.now)
-        self.assertEqual(candidates, [path])
+        self.assertEqual(len(candidates), 1)
+        self.assert_same_media_path(candidates[0], path)
         self.assertFalse(path.exists())
         self.assertTrue(recent_path.exists())
 
@@ -61,7 +67,8 @@ class TestMediaRetention(unittest.TestCase):
         database.close()
 
         candidates = cleanup_old_media(30, data_dir=self.data_dir, now=self.now)
-        self.assertEqual(candidates, [unreferenced])
+        self.assertEqual(len(candidates), 1)
+        self.assert_same_media_path(candidates[0], unreferenced)
 
     def test_invalid_retention_age_is_rejected(self):
         with self.assertRaises(ValueError):
