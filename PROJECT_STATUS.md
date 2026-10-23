@@ -17,11 +17,11 @@ SiteSentinel is a working **local construction-safety review app** built with Fa
 - [x] First-admin setup, password hashing, login/logout, expiring sessions, and account management.
 - [x] 61 automated tests passed; Python and JavaScript syntax checks passed.
 - [x] The 61-test suite also passes from a source-only checkout without model/media assets; 4 model-dependent tests skip with an explanation.
-- [x] Windows/Python 3.11 GitHub Actions workflow added; it still needs a run on GitHub.
+- [x] Source-only code published to GitHub; Windows/Python 3.11 CI passed on commit `a42e3ab` (61 tests, 4 model tests skipped because weights are excluded).
 
 ## Still to do
 
-1. [ ] Publish/connect the project to GitHub and verify the CI run.
+1. [x] Publish source/docs/tests to GitHub and verify the CI run.
 2. [ ] Review the Starlette/httpx deprecation warning from the test client.
 3. [ ] Add database backup/restore instructions and proper schema migrations.
 4. [ ] Confirm model licenses and measure model accuracy on labelled images.
@@ -38,3 +38,5 @@ SiteSentinel is a working **local construction-safety review app** built with Fa
 - The installed models' accuracy and redistribution rights have not been confirmed.
 
 For a simple architecture/technology explanation, see [docs/PROJECT_REPORT.md](docs/PROJECT_REPORT.md). To continue in another chat, see [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md).
+
+The first two GitHub Actions runs failed: the first exposed tests expecting omitted model assets; the second exposed Windows long/short path differences. Both were fixed. The latest run is green: [GitHub Actions](https://github.com/kpranjal2222-sketch/Ai_Assistant_project/actions).

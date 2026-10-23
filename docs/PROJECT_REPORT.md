@@ -78,7 +78,7 @@ Python package versions are pinned in `requirements.txt`; frontend build package
 | `tests/` | Automated application tests. |
 | `models/` | Local AI model files. |
 | `data/` | Local database and generated/review media. |
-| `.github/workflows/ci.yml` | Automated checks for Windows/Python 3.11; not yet verified on GitHub. |
+| `.github/workflows/ci.yml` | Automated checks for Windows/Python 3.11; latest run passed on commit `a42e3ab`. |
 
 ## 7. What is done and what remains?
 
@@ -88,7 +88,7 @@ Python package versions are pinned in `requirements.txt`; frontend build package
 - [x] Source-only checkout test run passed; 4 tests requiring unbundled model weights are skipped.
 - [x] Python compilation and JavaScript syntax checks passed.
 - [x] Browser-tested account setup, login, account creation, and logout.
-- [ ] Run the CI workflow on GitHub.
+- [x] GitHub Actions passed on `main` (61 tests, 4 model tests skipped because weights are excluded).
 - [ ] Add database migration and backup/restore guidance.
 - [ ] Confirm AI model licenses and test accuracy on labelled images.
 - [ ] Decide media-retention rules.
