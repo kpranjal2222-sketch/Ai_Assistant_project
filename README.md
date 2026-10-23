@@ -43,7 +43,7 @@ From the project folder:
 
 Open <http://localhost:8000>. Data is stored locally in SQLite and under `data/`.
 
-This source repository does not include AI model weights or sample photos/videos. Provide the model files separately and only when you have permission to use them. Without model files, AI review endpoints cannot run; without sample videos, the bundled video examples are unavailable.
+This source repository does not include AI model weights or sample photos/videos. Provide the model files separately and only when you have permission. Without model files, AI review endpoints cannot run; without sample videos, bundled video examples are unavailable.
 
 ## Check the project
 
