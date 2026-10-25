@@ -311,6 +311,22 @@ class StabilityTests(unittest.TestCase):
             422,
         )
 
+    def test_environment_provider_uses_urllib_request_for_external_lookup(self):
+        response = Mock()
+        response.__enter__ = Mock(return_value=response)
+        response.__exit__ = Mock(return_value=False)
+        response.read.return_value = b'{"results":[]}'
+        with patch.object(api, "urlopen", return_value=response) as open_url:
+            payload = api._fetch_open_meteo_json(
+                "geocoding",
+                {"name": "New Delhi", "count": 20},
+            )
+
+        self.assertEqual(payload, {"results": []})
+        request = open_url.call_args.args[0]
+        self.assertEqual(request.full_url, "https://geocoding-api.open-meteo.com/v1/search?name=New+Delhi&count=20")
+        self.assertEqual(request.get_header("User-agent"), "SiteSentinel/1.0 (local environmental dashboard)")
+
     def test_environment_current_returns_model_weather_and_separate_scenario(self):
         air = {
             "current": {"time": "2026-10-23T13:00", "pm2_5": 20.0, "pm10": 45.0, "us_aqi": 55},

@@ -17,10 +17,10 @@ const $$ = (sel) => document.querySelectorAll(sel);
 function themeColors() {
   const dark = document.documentElement.getAttribute("data-theme") === "dark";
   return dark
-    ? { orange: "#FF5A1F", blue: "#38BDF8", good: "#10B981", crit: "#EF4444",
-        grid: "#28323C", ink2: "#94A3B8", surface: "#111820" }
-    : { orange: "#E9690C", blue: "#2F6F8F", good: "#3F9D5B", crit: "#DC4B3E",
-        grid: "#E7DFD2", ink2: "#57534E", surface: "#FFFFFF" };
+    ? { orange: "#E58A68", blue: "#91B7C6", good: "#91B58A", crit: "#F07C70",
+        grid: "#41483F", ink2: "#C1C2B5", surface: "#252B26" }
+    : { orange: "#B44830", blue: "#4F7180", good: "#47764D", crit: "#B83C36",
+        grid: "#D8D6CC", ink2: "#535B52", surface: "#FBFAF6" };
 }
 let C = themeColors();
 
@@ -82,6 +82,8 @@ async function initializeAuthentication() {
 function showAuthenticationGate(message, setup = false, setupTokenRequired = false) {
   const gate = $("#authGate");
   currentUser = null;
+  applyRoleNavigation();
+  $("#topbarRiskBadge").style.display = "none";
   $("#signedInUser").classList.add("hidden");
   $("#signOutButton").classList.add("hidden");
   $("#manageUsersButton").classList.add("hidden");
@@ -91,11 +93,14 @@ function showAuthenticationGate(message, setup = false, setupTokenRequired = fal
   $("#authGateIntro").textContent = message;
   $("#authLoginForm").classList.toggle("hidden", setup);
   $("#authSetupForm").classList.toggle("hidden", !setup);
+  $("#authRegisterForm").classList.add("hidden");
+  $("#authRegisterLink").classList.toggle("hidden", setup);
   $("#authSetupTokenLabel").classList.toggle("hidden", !setupTokenRequired);
   $("#authSetupToken").classList.toggle("hidden", !setupTokenRequired);
   $("#authSetupToken").required = setupTokenRequired;
   $("#authMessage").textContent = "";
   $("#authMessage").style.color = "var(--ink-2)";
+  updateLoginRoleFields();
   authInitialized = true;
 }
 
@@ -107,7 +112,60 @@ function enableAuthenticatedApp(user) {
   $("#signedInUser").classList.remove("hidden");
   $("#signOutButton").classList.remove("hidden");
   $("#manageUsersButton").classList.toggle("hidden", user.role !== "admin");
-  showView("landing");
+  const employeeIdField = $("#attendanceEmployeeId");
+  employeeIdField.readOnly = user.role === "worker";
+  if (user.role === "worker") employeeIdField.value = user.username;
+  applyRoleNavigation();
+  showView(user.role === "worker" ? "worker-dashboard" : "landing");
+}
+
+function updateLoginRoleFields() {
+  const isWorker = $("#authLoginRole").value === "worker";
+  $("#authLoginIdentifierLabel").textContent = isWorker ? "Employee ID" : "Username";
+  $("#authLoginUsername").placeholder = isWorker ? "e.g. EMP001" : "";
+}
+
+function updateRegistrationFields() {
+  const role = $("#authRegisterRole").value;
+  const isWorker = role === "worker";
+  const isStaff = role === "supervisor" || role === "admin";
+  const guidance = {
+    visitor: "Visitor accounts are read-only. Use a unique username and password.",
+    worker: "Use your site-issued EMP number and invitation code. Employee IDs are unique and cannot be claimed twice.",
+    supervisor: "Supervisor accounts require approval and creation by an administrator. Contact your site administrator.",
+    admin: "Administrator accounts can only be created by an existing administrator. Contact your site administrator.",
+  };
+  $("#authRegisterGuidance").textContent = guidance[role];
+  $("#authRegisterNameLabel").classList.toggle("hidden", isStaff);
+  $("#authRegisterName").classList.toggle("hidden", isStaff);
+  $("#authRegisterName").required = !isStaff;
+  $("#authRegisterName").disabled = isStaff;
+  $("#authRegisterUsernameLabel").classList.toggle("hidden", isStaff || isWorker);
+  $("#authRegisterUsername").classList.toggle("hidden", isStaff || isWorker);
+  $("#authRegisterUsername").required = !isStaff && !isWorker;
+  $("#authRegisterUsername").disabled = isStaff || isWorker;
+  $("#authRegisterEmployeeId").classList.toggle("hidden", !isWorker);
+  $("#authRegisterEmployeeNumber").required = isWorker;
+  $("#authRegisterEmployeeNumber").disabled = !isWorker;
+  $("#authRegisterPasswordFields").classList.toggle("hidden", isStaff);
+  $("#authRegisterPassword").required = !isStaff;
+  $("#authRegisterPassword").disabled = isStaff;
+  $("#authRegisterInviteField").classList.toggle("hidden", !isWorker);
+  $("#authRegisterInviteCode").required = isWorker;
+  $("#authRegisterInviteCode").disabled = !isWorker;
+  $("#authRegisterSubmit").classList.toggle("hidden", isStaff);
+  $("#authRegisterSubmit").textContent = isWorker ? "Register worker account" : "Register visitor account";
+}
+
+function applyRoleNavigation() {
+  const workerViews = new Set(["worker-dashboard", "air-quality", "attendance"]);
+  $$(".nav-link").forEach((link) => {
+    link.style.display =
+      currentUser?.role === "worker" && !workerViews.has(link.dataset.view)
+        ? "none"
+        : "";
+  });
+  $("#topbarRiskBadge").style.display = currentUser?.role === "worker" ? "none" : "";
 }
 
 async function submitAuthForm(form, endpoint) {
@@ -118,6 +176,11 @@ async function submitAuthForm(form, endpoint) {
   message.style.color = "var(--ink-2)";
   try {
     const payload = Object.fromEntries(new FormData(form));
+    if (endpoint.endsWith("/worker-register")) {
+      payload.employee_id = `EMP${payload.employee_number}`;
+      delete payload.employee_number;
+    }
+    delete payload.account_type;
     const headers = { "Content-Type": "application/json" };
     if (endpoint.endsWith("/setup") && payload.setup_token) {
       headers["X-Setup-Token"] = payload.setup_token;
@@ -145,6 +208,35 @@ $("#authLoginForm").addEventListener("submit", (event) => {
   event.preventDefault();
   submitAuthForm(event.currentTarget, "/api/auth/login");
 });
+$("#authLoginRole").addEventListener("change", updateLoginRoleFields);
+$("#authRegisterRole").addEventListener("change", updateRegistrationFields);
+$("#authRegisterLink").addEventListener("click", () => {
+  $("#authLoginForm").classList.add("hidden");
+  const selectedRole = $("#authLoginRole").value;
+  $("#authRegisterRole").value = selectedRole === "worker" ? "worker"
+    : selectedRole === "admin" || selectedRole === "supervisor" ? selectedRole : "visitor";
+  updateRegistrationFields();
+  $("#authRegisterForm").classList.remove("hidden");
+  $("#authMessage").textContent = "";
+});
+$("#authRegisterLoginLink").addEventListener("click", () => {
+  $("#authRegisterForm").classList.add("hidden");
+  $("#authLoginForm").classList.remove("hidden");
+  $("#authMessage").textContent = "";
+});
+$("#authRegisterForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const role = $("#authRegisterRole").value;
+  if (role === "supervisor" || role === "admin") {
+    $("#authMessage").textContent = "Contact an administrator to request this account type.";
+    $("#authMessage").style.color = "var(--critical)";
+    return;
+  }
+  submitAuthForm(
+    event.currentTarget,
+    role === "worker" ? "/api/auth/worker-register" : "/api/auth/visitor-register",
+  );
+});
 $("#authSetupForm").addEventListener("submit", (event) => {
   event.preventDefault();
   submitAuthForm(event.currentTarget, "/api/auth/setup");
@@ -162,6 +254,12 @@ $("#signOutButton").addEventListener("click", async () => {
 
 // --------------------------------------------------------------------- nav
 function showView(name) {
+  if (
+    currentUser?.role === "worker"
+    && !new Set(["worker-dashboard", "air-quality", "attendance"]).has(name)
+  ) {
+    name = "worker-dashboard";
+  }
   if (currentView === "sentinel" && name !== "sentinel") {
     stopSentinel();
   }
@@ -181,6 +279,7 @@ function showView(name) {
   if (name === "tickets") loadTickets();
   if (name === "air-quality") loadAirQuality();
   if (name === "dashboard") loadDashboard();
+  if (name === "worker-dashboard") loadWorkerDashboard();
   if (name === "attendance") loadAttendance();
   if (name === "log") loadLog();
   if (name === "tracker") loadTasks();
@@ -267,6 +366,7 @@ $("#scenarioMitigation").addEventListener("change", refreshConstructionScenario)
 $("#manageUsersButton").addEventListener("click", () => {
   $("#userManagementDialog").classList.remove("hidden");
   loadManagedUsers();
+  loadWorkerSiteInfo(true);
 });
 $("#closeUserManagement").addEventListener("click", () => {
   $("#userManagementDialog").classList.add("hidden");
@@ -284,6 +384,33 @@ $("#createUserForm").addEventListener("submit", async (event) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+    });
+    $("#workerSiteInfoForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const message = $("#workerSiteInfoMessage");
+      const button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      message.textContent = "Saving worker dashboard information…";
+      message.style.color = "var(--ink-2)";
+      try {
+        const payload = Object.fromEntries(new FormData(form));
+        const response = await fetch("/api/worker/site-info", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw await responseError(response);
+        const data = await response.json();
+        renderWorkerSiteInfo(data);
+        message.textContent = "Worker dashboard information saved.";
+        message.style.color = "var(--good)";
+      } catch (error) {
+        message.textContent = `Could not save site information: ${error.message}`;
+        message.style.color = "var(--critical)";
+      } finally {
+        button.disabled = false;
+      }
     });
     if (!response.ok) throw await responseError(response);
     form.reset();
@@ -951,6 +1078,10 @@ function renderPreShift(data) {
 }
 
 async function loadAttendance() {
+  if (currentUser?.role === "worker") {
+    $("#attendanceEmployeeId").value = currentUser.username;
+    return;
+  }
   try {
     const data = await getJSON("/api/attendance");
     renderAttendanceRows(data.records || []);
@@ -958,6 +1089,116 @@ async function loadAttendance() {
     $("#attendanceTbody").innerHTML = `<tr><td colspan="5" class="text-center p-3 text-red-500">Could not load records: ${escapeHtml(error.message)}</td></tr>`;
   }
 }
+
+async function loadWorkerDashboard() {
+  const summary = $("#workerAttendanceSummary");
+  const history = $("#workerAttendanceHistory");
+  if (!currentUser || currentUser.role !== "worker") return;
+  try {
+    const [data, todayData] = await Promise.all([
+      getJSON("/api/attendance/me"),
+      getJSON("/api/attendance/today"),
+      loadWorkerSiteInfo(),
+    ]);
+    const records = data.records || [];
+    const today = todayData.record;
+    $("#workerTodayStatus").textContent = today
+      ? `Checked in today at ${today.checked_at}. Screening: ${today.ppe_status}. A supervisor must verify any PPE concern.`
+      : "Not checked in today. Use Check in when you are ready.";
+    summary.textContent = records.length
+      ? `Previous check-ins (${records.length} total):`
+      : "No previous check-ins yet.";
+    history.innerHTML = records.length
+      ? records.slice(0, 8).map((record) => `
+        <article class="rounded-lg border p-3" style="border-color:var(--border)">
+          <div class="flex items-center justify-between gap-2">
+            <strong>${escapeHtml(record.check_date)}</strong>
+            <span class="text-xs font-semibold">${escapeHtml(record.ppe_status)}</span>
+          </div>
+          <p class="text-xs mt-1" style="color:var(--ink-2)">${escapeHtml(record.checked_at)}</p>
+          <p class="text-xs mt-1">${escapeHtml(record.findings)}</p>
+        </article>
+      `).join("")
+      : `<p class="text-xs" style="color:var(--ink-2)">Your completed check-ins will appear here.</p>`;
+  } catch (error) {
+    summary.textContent = `Could not load your attendance: ${error.message}`;
+    history.textContent = "";
+  }
+}
+
+async function loadWorkerSiteInfo(forAdmin = false) {
+  try {
+    const data = await getJSON("/api/worker/site-info");
+    renderWorkerSiteInfo(data);
+    const form = $("#workerSiteInfoForm");
+    if (forAdmin && currentUser?.role === "admin") {
+      for (const field of form.elements) {
+        if (
+          field.name
+          && Object.prototype.hasOwnProperty.call(data, field.name)
+        ) {
+          field.value = data[field.name] || "";
+        }
+      }
+    }
+    return data;
+  } catch (error) {
+    if (forAdmin) {
+      $("#workerSiteInfoMessage").textContent = `Could not load site information: ${error.message}`;
+      $("#workerSiteInfoMessage").style.color = "var(--critical)";
+    } else {
+      $("#workerEmergencyInfo").textContent = `Could not load site information: ${error.message}`;
+      $("#workerSiteNotice").textContent = "Site notice unavailable.";
+    }
+    return null;
+  }
+}
+
+function renderWorkerSiteInfo(data) {
+  const items = [
+    ["Emergency contact", data.emergency_contact],
+    ["First-aid point", data.first_aid_location],
+    ["Assembly point", data.assembly_point],
+  ];
+  $("#workerEmergencyInfo").innerHTML = items.map(([label, value]) => `
+    <div class="flex flex-wrap gap-2">
+      <dt class="font-semibold">${escapeHtml(label)}:</dt>
+      <dd>${value ? escapeHtml(value) : "Not configured — ask your supervisor."}</dd>
+    </div>
+  `).join("");
+  $("#workerSiteNotice").textContent =
+    data.site_notice || "No site notice has been posted. Ask your supervisor for today's toolbox talk.";
+  $("#workerSiteNoticeUpdated").textContent = data.notice_updated_at
+    ? `Updated ${data.notice_updated_at}`
+    : "";
+}
+
+$("#workerHazardForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = $("#workerHazardSubmit");
+  const message = $("#workerHazardMessage");
+  button.disabled = true;
+  message.textContent = "Sending report to the supervisor incident list…";
+  message.style.color = "var(--ink-2)";
+  try {
+    const response = await fetch("/api/worker/hazard-reports", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(Object.fromEntries(new FormData(form))),
+    });
+    if (!response.ok) throw await responseError(response);
+    const result = await response.json();
+    form.reset();
+    message.textContent = `Report ${result.ticket_id} sent to the supervisor incident list. If anyone is in immediate danger, contact the site team now.`;
+    message.style.color = "var(--good)";
+  } catch (error) {
+    message.textContent = `Could not send report: ${error.message}. Tell a supervisor directly if this is urgent.`;
+    message.style.color = "var(--critical)";
+  } finally {
+    button.disabled = false;
+  }
+});
 
 function openAttendanceConfirmation(button) {
   const form = $("#attendanceConfirmForm");
@@ -1134,6 +1375,7 @@ $("#attendanceForm").addEventListener("submit", async (event) => {
     message.textContent = "Check-in recorded. Review the flags in person.";
     message.style.color = "var(--good)";
     await loadAttendance();
+    if (currentUser?.role === "worker") await loadWorkerDashboard();
   } catch (error) {
     attendancePhoto = null;
     $("#attendanceUpload").value = "";
@@ -2520,7 +2762,12 @@ function selectMapZone(zoneCode) {
 
   const selection = $("#mapZoneSelection");
   if (selection) {
-    selection.innerHTML = `<strong>${escapeHtml(zone.zone_code)} selected</strong><span>${escapeHtml(zone.name)} · ${escapeHtml(zone.risk_level || "UNRATED")}</span>`;
+    const hazard = String(zone.hazard_type || "Not specified").replaceAll("_", " ");
+    selection.innerHTML = `
+      <strong>${escapeHtml(zone.zone_code)} · ${escapeHtml(zone.risk_level || "UNRATED")}</strong>
+      <span>${escapeHtml(zone.name)}</span>
+      <span>Configured hazard: ${escapeHtml(hazard)}</span>
+    `;
   }
 }
 

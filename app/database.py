@@ -144,6 +144,18 @@ def init_db(seed_demo=True):
     )
     conn.execute(
         """
+        CREATE TABLE IF NOT EXISTS worker_site_info (
+            id                    INTEGER PRIMARY KEY CHECK(id = 1),
+            emergency_contact    TEXT NOT NULL DEFAULT '',
+            first_aid_location   TEXT NOT NULL DEFAULT '',
+            assembly_point       TEXT NOT NULL DEFAULT '',
+            site_notice          TEXT NOT NULL DEFAULT '',
+            notice_updated_at    TEXT NOT NULL DEFAULT ''
+        )
+        """
+    )
+    conn.execute(
+        """
         CREATE TABLE IF NOT EXISTS app_users (
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
             username        TEXT NOT NULL UNIQUE COLLATE NOCASE,
@@ -151,12 +163,44 @@ def init_db(seed_demo=True):
             password_hash   TEXT NOT NULL,
             password_salt   TEXT NOT NULL,
             password_rounds INTEGER NOT NULL,
-            role            TEXT NOT NULL CHECK(role IN ('admin', 'supervisor', 'viewer')),
+            role            TEXT NOT NULL CHECK(role IN ('admin', 'supervisor', 'viewer', 'worker')),
             is_active       INTEGER NOT NULL DEFAULT 1,
             created_at      TEXT NOT NULL
         )
         """
     )
+    user_table = conn.execute(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'app_users'"
+    ).fetchone()
+    if user_table and "'worker'" not in user_table[0]:
+        conn.execute("BEGIN IMMEDIATE")
+        conn.execute(
+            """
+            CREATE TABLE app_users_worker_migration (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                username        TEXT NOT NULL UNIQUE COLLATE NOCASE,
+                display_name    TEXT NOT NULL,
+                password_hash   TEXT NOT NULL,
+                password_salt   TEXT NOT NULL,
+                password_rounds INTEGER NOT NULL,
+                role            TEXT NOT NULL CHECK(role IN ('admin', 'supervisor', 'viewer', 'worker')),
+                is_active       INTEGER NOT NULL DEFAULT 1,
+                created_at      TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO app_users_worker_migration
+                (id, username, display_name, password_hash, password_salt,
+                 password_rounds, role, is_active, created_at)
+            SELECT id, username, display_name, password_hash, password_salt,
+                   password_rounds, role, is_active, created_at
+            FROM app_users
+            """
+        )
+        conn.execute("DROP TABLE app_users")
+        conn.execute("ALTER TABLE app_users_worker_migration RENAME TO app_users")
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS app_sessions (
@@ -290,6 +334,107 @@ def get_attendance_records(check_date: str | None = None) -> list[dict]:
         ))
         for row in rows
     ]
+
+
+def get_employee_attendance_records(employee_id: str) -> list[dict]:
+    """Return only the requested employee's saved attendance history."""
+    conn = _connect()
+    try:
+        rows = conn.execute(
+            """
+            SELECT employee_id, check_date, checked_at, ppe_status, findings
+            FROM attendance_records
+            WHERE employee_id = ? COLLATE NOCASE
+            ORDER BY check_date DESC, checked_at DESC
+            """,
+            (employee_id,),
+        ).fetchall()
+        return [
+            dict(zip(("employee_id", "check_date", "checked_at", "ppe_status", "findings"), row))
+            for row in rows
+        ]
+    finally:
+        conn.close()
+
+
+def get_employee_attendance_today(employee_id: str) -> dict | None:
+    """Return today's attendance record for one employee, if recorded."""
+    check_date = datetime.now().strftime("%Y-%m-%d")
+    conn = _connect()
+    try:
+        row = conn.execute(
+            """
+            SELECT employee_id, check_date, checked_at, ppe_status, findings
+            FROM attendance_records
+            WHERE employee_id = ? COLLATE NOCASE AND check_date = ?
+            """,
+            (employee_id, check_date),
+        ).fetchone()
+        if row is None:
+            return None
+        return dict(zip(("employee_id", "check_date", "checked_at", "ppe_status", "findings"), row))
+    finally:
+        conn.close()
+
+
+def get_worker_site_info() -> dict:
+    """Return administrator-configured emergency and daily worker information."""
+    conn = _connect()
+    try:
+        row = conn.execute(
+            """
+            SELECT emergency_contact, first_aid_location, assembly_point,
+                   site_notice, notice_updated_at
+            FROM worker_site_info WHERE id = 1
+            """
+        ).fetchone()
+        keys = (
+            "emergency_contact",
+            "first_aid_location",
+            "assembly_point",
+            "site_notice",
+            "notice_updated_at",
+        )
+        return dict(zip(keys, row)) if row else dict.fromkeys(keys, "")
+    finally:
+        conn.close()
+
+
+def save_worker_site_info(
+    emergency_contact: str,
+    first_aid_location: str,
+    assembly_point: str,
+    site_notice: str,
+) -> dict:
+    """Save site contact, emergency locations, and the current worker notice."""
+    updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = _connect()
+    try:
+        conn.execute(
+            """
+            INSERT INTO worker_site_info
+                (id, emergency_contact, first_aid_location, assembly_point,
+                 site_notice, notice_updated_at)
+            VALUES (1, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+                emergency_contact = excluded.emergency_contact,
+                first_aid_location = excluded.first_aid_location,
+                assembly_point = excluded.assembly_point,
+                site_notice = excluded.site_notice,
+                notice_updated_at = excluded.notice_updated_at
+            """,
+            (
+                emergency_contact,
+                first_aid_location,
+                assembly_point,
+                site_notice,
+                updated_at,
+            ),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return get_worker_site_info()
 
 
 def confirm_attendance_incident(

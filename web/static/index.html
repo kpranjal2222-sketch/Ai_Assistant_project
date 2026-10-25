@@ -23,7 +23,7 @@
   </script>
 
   <link rel="stylesheet" href="/css/tailwind.generated.css?v=v10-reviewed-followup" />
-  <link rel="stylesheet" href="/css/styles.css?v=v21-authentication" />
+  <link rel="stylesheet" href="/css/styles.css?v=v26-site-plan-guide" />
   <script defer src="/vendor/chart.umd.js?v=v19-location-model"></script>
   <script defer src="/vendor/lucide.min.js?v=v19-location-model"></script>
 </head>
@@ -37,20 +37,59 @@
       <h1 id="authGateTitle" class="text-2xl font-bold mt-1">Secure project access</h1>
       <p id="authGateIntro" class="text-sm mt-2" style="color:var(--ink-2)">Sign in to access project records and review tools.</p>
       <form id="authLoginForm" class="auth-form hidden">
-        <label for="authLoginUsername">Username</label>
+        <label for="authLoginRole">Sign in as</label>
+        <select id="authLoginRole" name="role" required>
+          <option value="admin">Administrator</option>
+          <option value="supervisor">Supervisor</option>
+          <option value="worker">Worker</option>
+          <option value="viewer">Visitor (read-only)</option>
+        </select>
+        <label id="authLoginIdentifierLabel" for="authLoginUsername">Username</label>
         <input id="authLoginUsername" name="username" autocomplete="username" required maxlength="32" />
         <label for="authLoginPassword">Password</label>
         <input id="authLoginPassword" name="password" type="password" autocomplete="current-password" required maxlength="256" />
         <button class="btn-primary justify-center mt-2" type="submit">Sign in</button>
+        <button id="authRegisterLink" class="btn-ghost justify-center" type="button">Need an account? Register</button>
+      </form>
+      <form id="authRegisterForm" class="auth-form hidden">
+        <label for="authRegisterRole">Account type</label>
+        <select id="authRegisterRole" name="account_type" required>
+          <option value="visitor">Visitor (read-only)</option>
+          <option value="worker">Worker</option>
+          <option value="supervisor">Supervisor (admin approval)</option>
+          <option value="admin">Administrator (admin approval)</option>
+        </select>
+        <p id="authRegisterGuidance" class="auth-setup-note" aria-live="polite"></p>
+        <label id="authRegisterNameLabel" for="authRegisterName">Name</label>
+        <input id="authRegisterName" name="display_name" autocomplete="name" required maxlength="80" />
+        <label id="authRegisterUsernameLabel" for="authRegisterUsername">Username</label>
+        <input id="authRegisterUsername" name="username" autocomplete="username" required minlength="5" maxlength="32" />
+        <div id="authRegisterEmployeeId" class="hidden">
+          <label for="authRegisterEmployeeNumber">Employee ID number (EMP + number)</label>
+          <div class="flex items-center gap-2">
+            <span class="font-mono font-bold" aria-hidden="true">EMP</span>
+            <input id="authRegisterEmployeeNumber" name="employee_number" inputmode="numeric" pattern="[0-9]{1,8}" maxlength="8" placeholder="001" aria-label="Employee ID number" />
+          </div>
+        </div>
+        <div id="authRegisterPasswordFields">
+          <label for="authRegisterPassword">Password</label>
+          <input id="authRegisterPassword" name="password" type="password" autocomplete="new-password" required minlength="6" maxlength="256" />
+          <div id="authRegisterInviteField" class="hidden">
+            <label for="authRegisterInviteCode">Site invitation code</label>
+            <input id="authRegisterInviteCode" name="invite_code" type="password" autocomplete="off" maxlength="256" />
+          </div>
+          <button id="authRegisterSubmit" class="btn-primary justify-center mt-2" type="submit">Register visitor account</button>
+        </div>
+        <button id="authRegisterLoginLink" class="btn-ghost justify-center" type="button">Already have an account? Sign in</button>
       </form>
       <form id="authSetupForm" class="auth-form hidden">
-        <p class="auth-setup-note">Create the first administrator account. Use a unique password with at least 12 characters.</p>
+        <p class="auth-setup-note">Create your project account. Use a username with at least 5 characters and a password with at least 6.</p>
         <label for="authSetupName">Display name</label>
         <input id="authSetupName" name="display_name" autocomplete="name" required maxlength="80" />
         <label for="authSetupUsername">Username</label>
-        <input id="authSetupUsername" name="username" autocomplete="username" required minlength="3" maxlength="32" />
+        <input id="authSetupUsername" name="username" autocomplete="username" required minlength="5" maxlength="32" />
         <label for="authSetupPassword">Password</label>
-        <input id="authSetupPassword" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="256" />
+        <input id="authSetupPassword" name="password" type="password" autocomplete="new-password" required minlength="6" maxlength="256" />
         <label for="authSetupToken" id="authSetupTokenLabel" class="hidden">One-time setup token</label>
         <input id="authSetupToken" name="setup_token" class="hidden" autocomplete="off" />
         <button class="btn-primary justify-center mt-2" type="submit">Create administrator</button>
@@ -86,6 +125,7 @@
         <a class="nav-link" data-view="tickets" title="Incidents"><i data-lucide="ticket" class="w-3.5 h-3.5"></i>Incidents</a>
         <a class="nav-link" data-view="air-quality" title="Air Quality"><i data-lucide="wind" class="w-3.5 h-3.5"></i>Air Quality</a>
         <a class="nav-link" data-view="dashboard" title="Overview"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>Overview</a>
+        <a class="nav-link" data-view="worker-dashboard" title="Worker Home"><i data-lucide="hard-hat" class="w-3.5 h-3.5"></i>Worker Home</a>
         <a class="nav-link" data-view="attendance" title="Check-in"><i data-lucide="user-check" class="w-3.5 h-3.5"></i>Check-in</a>
         <a class="nav-link" data-view="detect" title="Photo Review"><i data-lucide="camera" class="w-3.5 h-3.5"></i>Photo Review</a>
         <a class="nav-link" data-view="video" title="Video Review"><i data-lucide="video" class="w-3.5 h-3.5"></i>Video Review</a>
@@ -122,6 +162,7 @@
       <a class="nav-link" data-view="tickets"><i data-lucide="ticket"></i>Incident Follow-up</a>
       <a class="nav-link" data-view="air-quality"><i data-lucide="wind"></i>Air Quality &amp; Weather</a>
       <a class="nav-link" data-view="dashboard"><i data-lucide="layout-dashboard"></i>Site Dashboard</a>
+      <a class="nav-link" data-view="worker-dashboard"><i data-lucide="hard-hat"></i>Worker Home</a>
       <a class="nav-link" data-view="attendance"><i data-lucide="user-check"></i>Worker Check-in</a>
       <a class="nav-link" data-view="detect"><i data-lucide="camera"></i>Photo Safety AI</a>
       <a class="nav-link" data-view="video"><i data-lucide="video"></i>Video Detection</a>
@@ -139,15 +180,33 @@
       </div>
       <form id="createUserForm" class="user-create-form">
         <label for="newUserName">Display name</label><input id="newUserName" name="display_name" required maxlength="80" />
-        <label for="newUserUsername">Username</label><input id="newUserUsername" name="username" required minlength="3" maxlength="32" autocomplete="off" />
-        <label for="newUserPassword">Initial password</label><input id="newUserPassword" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password" />
+        <label for="newUserUsername">Username</label><input id="newUserUsername" name="username" required minlength="5" maxlength="32" autocomplete="off" />
+        <label for="newUserPassword">Initial password (at least 6 characters)</label><input id="newUserPassword" name="password" type="password" required minlength="6" maxlength="256" autocomplete="new-password" />
         <label for="newUserRole">Role</label>
-        <select id="newUserRole" name="role"><option value="viewer">Viewer</option><option value="supervisor">Supervisor</option><option value="admin">Administrator</option></select>
+        <select id="newUserRole" name="role"><option value="viewer">Visitor / Viewer</option><option value="worker">Worker</option><option value="supervisor">Supervisor</option><option value="admin">Administrator</option></select>
         <button class="btn-primary" type="submit">Create account</button>
       </form>
-      <p class="text-xs mt-2" style="color:var(--ink-2)">Set a unique password for each account and share it securely. Viewer accounts can only read.</p>
+      <p class="text-xs mt-2" style="color:var(--ink-2)">Set a unique password for each account and share it securely. Worker usernames must be unique EMP IDs (for example, EMP001); workers can access only their own check-in and AQI information. Viewers can only read.</p>
       <div id="managedUsers" class="managed-users"></div>
       <p id="userManagementMessage" class="text-sm mt-2" role="status"></p>
+      <form id="workerSiteInfoForm" class="mt-4 grid gap-2 border-t pt-4" style="border-color:var(--border)">
+        <h3 class="font-semibold text-sm">Worker dashboard information</h3>
+        <p class="text-xs" style="color:var(--ink-2)">Enter verified site details and the current toolbox talk/site notice. Blank emergency details are shown as not configured.</p>
+        <label class="text-xs">Emergency contact
+          <input class="btn-ghost w-full mt-1" name="emergency_contact" maxlength="80" placeholder="Site emergency number or contact">
+        </label>
+        <label class="text-xs">First-aid point
+          <input class="btn-ghost w-full mt-1" name="first_aid_location" maxlength="160" placeholder="Building / location">
+        </label>
+        <label class="text-xs">Assembly point
+          <input class="btn-ghost w-full mt-1" name="assembly_point" maxlength="160" placeholder="Emergency meeting location">
+        </label>
+        <label class="text-xs">Site notice / toolbox talk
+          <textarea class="btn-ghost w-full mt-1" name="site_notice" maxlength="1000" rows="3" placeholder="Current shift's safety information"></textarea>
+        </label>
+        <button class="btn-primary justify-center" type="submit">Save worker dashboard information</button>
+        <p id="workerSiteInfoMessage" class="text-xs" role="status" aria-live="polite"></p>
+      </form>
     </article>
   </section>
 
@@ -339,172 +398,182 @@
     <section id="view-map" class="view">
       <div class="site-map-heading">
         <div>
-          <span class="site-map-kicker">PROJECT LAYOUT / FIELD REFERENCE</span>
-          <h1 class="text-2xl font-bold mt-1 mb-1">Custom site layout</h1>
-          <p class="text-sm" style="color:var(--ink-2)">Explore the original site-plan illustration, configured hazard areas, facilities, and access routes.</p>
+          <span class="site-map-kicker">SITE REFERENCE / TRAINING DIAGRAM</span>
+          <h1 class="text-2xl font-bold mt-1 mb-1">Illustrative site plan</h1>
+          <p class="text-sm" style="color:var(--ink-2)">A visual guide to example work areas, site facilities, and access routes.</p>
         </div>
-        <span class="hud-pill info font-mono flex items-center gap-1.5"><i data-lucide="map" class="w-3.5 h-3.5"></i> ILLUSTRATIVE · NOT SURVEYED</span>
+        <span class="hud-pill warn font-mono flex items-center gap-1.5"><i data-lucide="triangle-alert" class="w-3.5 h-3.5"></i>EXAMPLE ONLY · NOT A REAL SITE MAP</span>
+      </div>
+
+      <div class="site-map-explainer" role="note">
+        <div class="site-map-explainer-icon"><i data-lucide="map" aria-hidden="true"></i></div>
+        <div>
+          <strong>How to use this page</strong>
+          <p>Select a zone from the list or directly on the drawing to see its configured hazard and risk label. Use the layer switches to simplify the drawing. Choose a demo source to open its review screen; video review starts only when you press Start.</p>
+        </div>
+        <span>Positions are schematic. Zone labels are setup examples, not live readings.</span>
       </div>
 
       <div class="site-map-layout">
         <div class="card site-plan-card">
           <div class="site-plan-toolbar">
             <div>
-              <span class="site-map-kicker">CONSTRUCTION AREA</span>
-              <div class="site-plan-title">Illustrative site arrangement</div>
+              <span class="site-map-kicker">TOP-DOWN VIEW / NOT TO SCALE</span>
+              <div class="site-plan-title">Work areas &amp; site facilities</div>
             </div>
-            <span class="site-plan-note">REFERENCE ONLY <span aria-hidden="true">·</span> NO LIVE DATA</span>
+            <span class="site-plan-note">SCHEMATIC <span aria-hidden="true">·</span> NO GPS OR LIVE CAMERAS</span>
           </div>
           <div class="site-map-controls" aria-label="Site plan layers">
-            <span class="site-map-control-label">LAYERS</span>
+            <span class="site-map-control-label">SHOW / HIDE</span>
             <label><input type="checkbox" data-map-layer="zones" checked> Hazard zones</label>
             <label><input type="checkbox" data-map-layer="facilities" checked> Site facilities</label>
             <label><input type="checkbox" data-map-layer="routes" checked> Roads &amp; gate</label>
             <label><input type="checkbox" data-map-layer="sources" checked> Demo sources</label>
           </div>
           <div class="site-plan-viewport">
-            <svg id="sitePlan" class="site-plan" viewBox="0 0 1000 650" role="img" aria-labelledby="sitePlanTitle sitePlanDescription">
-              <title id="sitePlanTitle">Custom illustrative construction site layout</title>
-              <desc id="sitePlanDescription">An original, hand-drawn, not-surveyed top-down construction plan with a perimeter fence, access gate, haul route, support facilities, emergency assembly point, crane, and five selectable configured zones. Zone colors reflect configured risk labels, not measured site conditions.</desc>
+            <svg id="sitePlan" class="site-plan" viewBox="0 0 1200 780" role="img" aria-labelledby="sitePlanTitle sitePlanDescription">
+              <title id="sitePlanTitle">Illustrative construction site plan, not to scale</title>
+              <desc id="sitePlanDescription">A clean schematic training diagram with five selectable hazard areas, clearly marked site facilities, access road, gate, and assembly point. It is not a surveyed site map and shows no live conditions or camera locations.</desc>
               <defs>
-                <pattern id="siteGrid" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 40" class="site-grid-line" fill="none"/>
-                </pattern>
-                <pattern id="concreteHatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
-                  <line x1="0" y1="0" x2="0" y2="12" class="site-hatch-line"/>
-                </pattern>
-                <pattern id="soilHatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                  <line x1="0" y1="0" x2="0" y2="10" class="site-soil-line"/>
+                <pattern id="siteGrid" width="48" height="48" patternUnits="userSpaceOnUse">
+                  <path d="M48 0H0V48" class="site-grid-line" fill="none"/>
                 </pattern>
                 <filter id="zoneShadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#10140f" flood-opacity=".16"/>
+                  <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#111" flood-opacity=".22"/>
                 </filter>
+                <marker id="routeArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                  <path d="M0 0L10 5L0 10Z" class="site-route-arrow"/>
+                </marker>
               </defs>
 
-              <rect width="1000" height="650" class="site-ground"/>
-              <rect width="1000" height="650" fill="url(#siteGrid)" opacity=".68"/>
+              <rect width="1200" height="780" class="site-ground"/>
+              <rect width="1200" height="780" fill="url(#siteGrid)" opacity=".45"/>
 
-              <!-- Perimeter and site access -->
-              <rect x="42" y="38" width="916" height="574" rx="16" class="site-perimeter"/>
-              <path d="M44 548 H110 V510 H892 V132 H925" class="site-haul-road"/>
-              <path d="M44 548 H110 V510 H892 V132 H925" class="site-road-center"/>
-              <path d="M42 548 H95" class="site-gate-line"/>
-              <path d="M42 533 V563 M52 533 V563 M62 533 V563 M72 533 V563 M82 533 V563" class="site-gate-post"/>
-              <g class="site-label" transform="translate(66 584)">
-                <rect width="126" height="25" rx="6" class="site-label-bg"/>
-                <text x="12" y="17">SITE ACCESS GATE</text>
-              </g>
-              <text x="142" y="499" class="site-road-label">INTERNAL HAUL ROUTE</text>
-
-              <!-- Site support facilities -->
-              <g class="site-building" transform="translate(108 72)">
-                <rect width="150" height="50" rx="5" class="site-building-shell"/>
-                <path d="M12 13 H138 M12 25 H138 M12 37 H138" class="site-building-detail"/>
-                <text x="75" y="31" text-anchor="middle" class="site-building-label">SITE OFFICE</text>
-              </g>
-              <g class="site-building" transform="translate(272 72)">
-                <rect width="70" height="50" rx="5" class="site-building-shell"/>
-                <path d="M10 13 H60 M10 25 H60 M10 37 H60" class="site-building-detail"/>
-                <text x="35" y="31" text-anchor="middle" class="site-building-label">FIRST AID</text>
-              </g>
-              <g class="site-building" transform="translate(770 72)">
-                <rect width="126" height="50" rx="5" class="site-building-shell"/>
-                <path d="M12 13 H114 M12 25 H114 M12 37 H114" class="site-building-detail"/>
-                <text x="63" y="31" text-anchor="middle" class="site-building-label">MATERIALS</text>
-              </g>
-              <g class="site-building" transform="translate(790 535)">
-                <rect width="98" height="46" rx="5" class="site-building-shell"/>
-                <path d="M12 12 H86 M12 23 H86 M12 34 H86" class="site-building-detail"/>
-                <text x="49" y="28" text-anchor="middle" class="site-building-label">PARKING</text>
-              </g>
-              <g class="site-building" transform="translate(674 535)">
-                <rect width="92" height="46" rx="5" class="site-building-shell"/>
-                <path d="M12 12 H80 M12 23 H80 M12 34 H80" class="site-building-detail"/>
-                <text x="46" y="28" text-anchor="middle" class="site-building-label">WASTE SKIP</text>
+              <g class="site-plan-header">
+                <text x="56" y="38">SITE ARRANGEMENT</text>
+                <text x="1144" y="38" text-anchor="end">SCHEMATIC / NOT TO SCALE</text>
               </g>
 
-              <!-- Main structure under construction -->
+              <rect x="42" y="54" width="1116" height="684" rx="16" class="site-perimeter"/>
+
+              <g class="site-map-routes">
+                <path d="M72 674H104V610H1090V178" class="site-haul-road"/>
+                <path d="M72 674H104V610H1090V178" class="site-road-center" marker-end="url(#routeArrow)"/>
+                <path d="M54 674H104" class="site-gate-line"/>
+                <path d="M58 656V692M70 656V692M82 656V692M94 656V692" class="site-gate-post"/>
+                <g class="site-label" transform="translate(118 647)">
+                  <rect width="176" height="38" rx="3" class="site-label-bg"/>
+                  <text x="14" y="25">SITE ACCESS GATE</text>
+                </g>
+                <text x="610" y="596" text-anchor="middle" class="site-road-label">INTERNAL SITE ROAD</text>
+              </g>
+
+              <g class="site-building site-office" transform="translate(80 82)">
+                <rect width="210" height="92" rx="4" class="site-building-shell"/>
+                <path d="M18 26H192M18 40H192" class="site-building-detail"/>
+                <text x="18" y="65" class="site-building-label">SITE OFFICE</text>
+                <text x="18" y="82" class="site-building-sub">SITE MANAGEMENT</text>
+              </g>
+              <g class="site-building site-first-aid" transform="translate(308 82)">
+                <rect width="92" height="92" rx="4" class="site-building-shell"/>
+                <path d="M46 22V58M28 40H64" class="site-first-aid-mark"/>
+                <text x="46" y="80" text-anchor="middle" class="site-building-sub">FIRST AID</text>
+              </g>
               <g class="site-structure">
-                <rect x="365" y="86" width="270" height="130" rx="4" class="site-structure-shell"/>
-                <rect x="365" y="86" width="270" height="130" rx="4" fill="url(#concreteHatch)"/>
-                <path d="M455 86 V216 M545 86 V216 M365 151 H635" class="site-structure-lines"/>
-                <text x="500" y="143" text-anchor="middle" class="site-structure-title">BUILDING A</text>
-                <text x="500" y="162" text-anchor="middle" class="site-small-label">STRUCTURAL WORKS</text>
+                <rect x="430" y="82" width="360" height="154" rx="4" class="site-structure-shell"/>
+                <path d="M550 82V236M670 82V236M430 158H790" class="site-structure-lines"/>
+                <text x="610" y="145" text-anchor="middle" class="site-structure-title">BUILDING A</text>
+                <text x="610" y="174" text-anchor="middle" class="site-structure-sub">STRUCTURAL WORKS</text>
               </g>
-              <g class="site-building">
-                <rect x="786" y="305" width="80" height="24" rx="4" class="site-building-shell"/>
-                <text x="826" y="321" text-anchor="middle" class="site-small-label">GENERATOR</text>
-              </g>
-              <g class="site-building site-assembly" transform="translate(400 535)">
-                <rect width="152" height="46" rx="6" class="site-assembly-shell"/>
-                <path d="M14 13 H138 M14 33 H138" class="site-assembly-line"/>
-                <text x="76" y="24" text-anchor="middle" class="site-assembly-label">ASSEMBLY POINT</text>
-                <text x="76" y="43" text-anchor="middle" class="site-small-label">EMERGENCY MUSTER</text>
+              <g class="site-building site-materials" transform="translate(820 82)">
+                <rect width="246" height="92" rx="4" class="site-building-shell"/>
+                <path d="M18 58H228M78 28V58M138 28V58M198 28V58" class="site-building-detail"/>
+                <text x="18" y="26" class="site-building-label">MATERIALS &amp; STORAGE</text>
               </g>
 
-              <!-- Configured example zones; positions are schematic only -->
-              <g class="site-zone" data-zone-code="ZONE-A" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone A, excavation and trench area">
-                <path d="M108 330 H295 V465 H108 Z" class="site-zone-shape"/>
-                <path d="M120 354 H284 V450 H120 Z" fill="url(#soilHatch)" class="site-zone-detail"/>
-                <text x="124" y="350" class="site-zone-code">ZONE A</text>
-                <text x="124" y="376" class="site-zone-label">EXCAVATION</text>
-                <text x="124" y="394" class="site-zone-sub">TRENCH / EARTHWORKS</text>
-                <path d="M132 421 H268 M132 432 H268" class="site-zone-contour"/>
+              <g class="site-building site-generator" transform="translate(1092 330)">
+                <rect width="42" height="174" rx="3" class="site-building-shell"/>
+                <path d="M12 18V156M22 18V156M32 18V156" class="site-building-detail"/>
+                <text transform="translate(1119 490) rotate(-90)" class="site-building-sub">GENERATOR</text>
+              </g>
+
+              <g class="site-zone" data-zone-code="ZONE-D" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone D, elevated framing deck">
+                <rect x="82" y="220" width="286" height="158" rx="5" class="site-zone-shape"/>
+                <text x="104" y="253" class="site-zone-code">ZONE D</text>
+                <text x="104" y="292" class="site-zone-label">Elevated framing</text>
+                <text x="104" y="321" class="site-zone-sub">FALL-FROM-HEIGHT AREA</text>
+                <path d="M104 344H344" class="site-zone-contour"/>
               </g>
               <g class="site-zone" data-zone-code="ZONE-B" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone B, high-voltage transformer bay">
-                <rect x="674" y="155" width="218" height="132" rx="8" class="site-zone-shape"/>
-                <rect x="692" y="197" width="182" height="70" rx="5" class="site-zone-detail"/>
-                <path d="M715 212 V252 M742 212 V252 M769 212 V252 M796 212 V252 M823 212 V252" class="site-equipment-line"/>
-                <text x="694" y="180" class="site-zone-code">ZONE B</text>
-                <text x="694" y="294" class="site-zone-sub">ELECTRICAL / RESTRICTED ACCESS</text>
+                <rect x="832" y="220" width="244" height="158" rx="5" class="site-zone-shape"/>
+                <text x="854" y="253" class="site-zone-code">ZONE B</text>
+                <text x="854" y="292" class="site-zone-label">Transformer bay</text>
+                <text x="854" y="321" class="site-zone-sub">HIGH-VOLTAGE / RESTRICTED</text>
+                <path d="M854 344H1054" class="site-zone-contour"/>
               </g>
-              <g class="site-zone" data-zone-code="ZONE-C" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone C, tower crane swing radius">
-                <circle cx="500" cy="358" r="112" class="site-zone-shape"/>
-                <circle cx="500" cy="358" r="84" class="site-zone-detail"/>
-                <path d="M500 358 V255 M500 358 L584 314 M500 358 L424 400" class="site-crane-line"/>
-                <circle cx="500" cy="358" r="8" class="site-crane-hub"/>
-                <text x="500" y="476" text-anchor="middle" class="site-zone-code">ZONE C · CRANE SWING AREA</text>
-              </g>
-              <g class="site-zone" data-zone-code="ZONE-D" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone D, elevated framing deck">
-                <path d="M105 155 H315 V285 H105 Z" class="site-zone-shape"/>
-                <path d="M125 180 H295 V260 H125 Z" class="site-zone-detail"/>
-                <path d="M125 180 L295 260 M295 180 L125 260 M210 180 V260 M125 220 H295" class="site-platform-lines"/>
-                <text x="124" y="174" class="site-zone-code">ZONE D</text>
-                <text x="210" y="279" text-anchor="middle" class="site-zone-sub">ELEVATED FRAMING DECK</text>
+
+              <g class="site-zone" data-zone-code="ZONE-A" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone A, excavation and trench area">
+                <rect x="82" y="414" width="286" height="158" rx="5" class="site-zone-shape"/>
+                <text x="104" y="447" class="site-zone-code">ZONE A</text>
+                <text x="104" y="486" class="site-zone-label">Excavation &amp; trench</text>
+                <text x="104" y="515" class="site-zone-sub">GROUNDWORKS AREA</text>
+                <path d="M104 538H344" class="site-zone-contour"/>
               </g>
               <g class="site-zone" data-zone-code="ZONE-E" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone E, hot-work and fuel storage bay">
-                <rect x="674" y="345" width="218" height="154" rx="8" class="site-zone-shape"/>
-                <path d="M694 390 H872 V478 H694 Z" class="site-zone-detail"/>
-                <path d="M750 390 V478 M812 390 V478 M694 434 H872" class="site-zone-grid"/>
-                <text x="694" y="372" class="site-zone-code">ZONE E</text>
-                <text x="694" y="523" class="site-zone-sub">HOT WORK / FUEL STORAGE</text>
+                <rect x="832" y="414" width="244" height="158" rx="5" class="site-zone-shape"/>
+                <text x="854" y="447" class="site-zone-code">ZONE E</text>
+                <text x="854" y="486" class="site-zone-label">Hot-work &amp; fuel</text>
+                <text x="854" y="515" class="site-zone-sub">FIRE / STORAGE AREA</text>
+                <path d="M854 538H1054" class="site-zone-contour"/>
               </g>
 
-              <!-- North marker and drawing reference -->
-              <g transform="translate(928 75)" class="site-north">
-                <path d="M0 28 L10 0 L20 28 L10 22 Z"/>
-                <text x="10" y="44" text-anchor="middle">N</text>
+              <g class="site-zone" data-zone-code="ZONE-C" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone C, tower crane swing radius">
+                <circle cx="610" cy="420" r="142" class="site-zone-shape"/>
+                <circle cx="610" cy="420" r="112" class="site-zone-detail"/>
+                <path d="M610 420V300M610 420L708 364M610 420L510 476" class="site-crane-line"/>
+                <circle cx="610" cy="420" r="13" class="site-crane-hub"/>
+                <text x="610" y="458" text-anchor="middle" class="site-zone-code">ZONE C</text>
+                <text x="610" y="486" text-anchor="middle" class="site-zone-label">Crane swing radius</text>
               </g>
-              <text x="806" y="596" class="site-drawing-note">SCHEMATIC · NOT TO SCALE</text>
 
-              <!-- Example sources are clickable, but do not imply live coverage -->
+              <g class="site-building site-assembly" transform="translate(466 640)">
+                <rect width="286" height="68" rx="4" class="site-assembly-shell"/>
+                <path d="M18 16H268M18 52H268" class="site-assembly-line"/>
+                <text x="143" y="43" text-anchor="middle" class="site-assembly-label">EMERGENCY ASSEMBLY POINT</text>
+              </g>
+              <g class="site-building site-waste" transform="translate(330 646)">
+                <rect width="102" height="54" rx="4" class="site-building-shell"/>
+                <text x="51" y="34" text-anchor="middle" class="site-building-sub">WASTE</text>
+              </g>
+              <g class="site-building site-parking" transform="translate(772 646)">
+                <rect width="132" height="54" rx="4" class="site-building-shell"/>
+                <path d="M28 12V42M58 12V42M88 12V42" class="site-building-detail"/>
+                <text x="66" y="50" text-anchor="middle" class="site-building-sub">PARKING</text>
+              </g>
+
+              <g transform="translate(1092 80)" class="site-north">
+                <path d="M16 0L31 42L16 33L1 42Z"/>
+                <text x="16" y="66" text-anchor="middle">N</text>
+              </g>
+
               <g class="site-source-node" data-camera-id="cam1" tabindex="0" role="button" aria-label="Open local sample clip A">
-                <circle cx="325" cy="510" r="15" class="site-source-halo"/>
-                <circle cx="325" cy="510" r="7" class="site-source-dot"/>
-                <text x="325" y="540" text-anchor="middle" class="site-source-label">CLIP A</text>
+                <circle cx="470" cy="578" r="17" class="site-source-halo"/>
+                <circle cx="470" cy="578" r="7" class="site-source-dot"/>
+                <text x="470" y="608" text-anchor="middle" class="site-source-label">CLIP A</text>
               </g>
               <g class="site-source-node" data-camera-id="cam2" tabindex="0" role="button" aria-label="Open local sample clip B">
-                <circle cx="920" cy="320" r="15" class="site-source-halo"/>
-                <circle cx="920" cy="320" r="7" class="site-source-dot"/>
-                <text x="920" y="347" text-anchor="middle" class="site-source-label">CLIP B</text>
+                <circle cx="1114" cy="270" r="17" class="site-source-halo"/>
+                <circle cx="1114" cy="270" r="7" class="site-source-dot"/>
+                <text x="1114" y="302" text-anchor="middle" class="site-source-label">CLIP B</text>
               </g>
               <g class="site-source-node" data-camera-id="webcam" tabindex="0" role="button" aria-label="Open local webcam after granting browser permission">
-                <circle cx="357" cy="248" r="15" class="site-webcam-halo"/>
-                <circle cx="357" cy="248" r="7" class="site-webcam-dot"/>
-                <text x="357" y="275" text-anchor="middle" class="site-source-label">WEBCAM</text>
+                <circle cx="394" cy="312" r="17" class="site-webcam-halo"/>
+                <circle cx="394" cy="312" r="7" class="site-webcam-dot"/>
+                <text x="394" y="344" text-anchor="middle" class="site-source-label">WEBCAM</text>
               </g>
             </svg>
           </div>
+          <p class="site-map-mobile-hint">Swipe sideways to inspect the full schematic.</p>
           <div class="site-plan-footer">
             <div class="site-risk-legend" aria-label="Configured zone risk colors">
               <span><i class="site-risk-dot" data-risk-level="low"></i>Low</span>
@@ -527,7 +596,7 @@
               </div>
               <span class="site-zone-count" id="mapActiveZonesCount">0</span>
             </div>
-            <p class="site-sidebar-note">Select a zone to locate it on the schematic. Risk levels are configured examples, not live conditions.</p>
+            <p class="site-sidebar-note">Choose a zone to highlight its approximate position. Hazard type and risk level are configured labels; they do not indicate current site conditions.</p>
             <div id="mapZonesList" class="site-zone-list" aria-label="Configured zones">
               <div class="text-sm italic" style="color:var(--muted)">Loading configured zones…</div>
             </div>
@@ -542,7 +611,7 @@
               </div>
               <span class="site-source-count">3 SOURCES</span>
             </div>
-            <p class="site-sidebar-note">Open a local sample or request permission for your webcam. No site cameras are connected.</p>
+            <p class="site-sidebar-note">These are local demo inputs, not site cameras. Selecting one opens the review screen; you choose when to start processing.</p>
             <div class="site-source-list">
               <button type="button" class="site-source-button" data-camera-id="cam1">
                 <span><i data-lucide="video" aria-hidden="true"></i><span>Sample clip A</span></span><span class="site-source-kind">LOCAL FILE</span>
@@ -927,6 +996,89 @@
       </div>
     </section>
 
+    <section id="view-worker-dashboard" class="view">
+      <div class="worker-welcome mb-5">
+        <div class="worker-welcome-copy">
+          <p class="text-[10px] font-mono tracking-widest uppercase">SiteSentinel / Shift start</p>
+          <h1>Before you step onto site.</h1>
+          <p>Take a moment to check in, read the site briefing, and understand today's conditions. Use this page as your quick field reference.</p>
+          <div class="worker-welcome-actions">
+            <button class="btn-primary" type="button" data-view="attendance"><i data-lucide="user-check" class="w-4 h-4"></i>Start check-in</button>
+            <button class="btn-ghost" type="button" data-view="air-quality"><i data-lucide="wind" class="w-4 h-4"></i>Check area conditions</button>
+          </div>
+        </div>
+        <div class="worker-shift-notes" aria-label="Quick shift reminders">
+          <div><span>01</span><p><strong>Check in</strong><small>Record your entry for today.</small></p></div>
+          <div><span>02</span><p><strong>Read the brief</strong><small>Review the toolbox talk and emergency points.</small></p></div>
+          <div><span>03</span><p><strong>Stay aware</strong><small>Report hazards to your supervisor promptly.</small></p></div>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <article class="card p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h2 class="font-semibold">My attendance</h2>
+              <p class="text-xs mt-1" style="color:var(--ink-2)">Only your own records are shown here.</p>
+            </div>
+            <button class="btn-primary text-xs" type="button" data-view="attendance">Check in</button>
+          </div>
+          <p id="workerTodayStatus" class="text-sm mt-4" role="status">Loading today's check-in status…</p>
+          <p id="workerAttendanceSummary" class="text-xs mt-2" style="color:var(--ink-2)"></p>
+          <div id="workerAttendanceHistory" class="mt-3 space-y-2 text-sm"></div>
+        </article>
+        <article class="card p-4">
+          <h2 class="font-semibold">Air quality &amp; weather</h2>
+          <p class="text-sm mt-2" style="color:var(--ink-2)">Check current regional AQI and weather before starting outdoor work. These are model estimates, not onsite sensor readings.</p>
+          <button class="btn-ghost text-xs mt-4" type="button" data-view="air-quality">View AQI &amp; weather</button>
+        </article>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <article class="card p-4">
+          <h2 class="font-semibold">Emergency information</h2>
+          <dl id="workerEmergencyInfo" class="mt-3 space-y-2 text-sm" aria-live="polite">
+            <div>Loading verified site information…</div>
+          </dl>
+        </article>
+        <article class="card p-4">
+          <h2 class="font-semibold">Site notice / toolbox talk</h2>
+          <p id="workerSiteNotice" class="mt-3 whitespace-pre-wrap text-sm" style="color:var(--ink-2)">Loading today's site notice…</p>
+          <p id="workerSiteNoticeUpdated" class="text-xs mt-2" style="color:var(--muted)"></p>
+        </article>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <article class="card p-4">
+          <h2 class="font-semibold">Report a hazard or near miss</h2>
+          <p class="text-xs mt-1" style="color:var(--ink-2)">Your report is sent to the supervisor incident list. For an emergency, contact the site team immediately; do not rely on this form.</p>
+          <form id="workerHazardForm" class="grid gap-2 mt-3">
+            <label class="text-xs">Report type
+              <select class="btn-ghost w-full mt-1" name="report_type" required>
+                <option value="hazard">Hazard / unsafe condition</option>
+                <option value="near_miss">Near miss</option>
+                <option value="injury">Injury</option>
+              </select>
+            </label>
+            <label class="text-xs">Where did it happen?
+              <input class="btn-ghost w-full mt-1" name="location" required maxlength="120" placeholder="Area, floor, or zone">
+            </label>
+            <label class="text-xs">What happened?
+              <textarea class="btn-ghost w-full mt-1" name="description" required maxlength="1000" rows="3" placeholder="Describe the hazard or event"></textarea>
+            </label>
+            <button class="btn-primary justify-center" id="workerHazardSubmit" type="submit">Send report to supervisor</button>
+            <p id="workerHazardMessage" class="text-xs" role="status" aria-live="polite"></p>
+          </form>
+        </article>
+        <article class="card p-4">
+          <h2 class="font-semibold">Daily safety reminders</h2>
+          <ul class="mt-3 space-y-2 text-sm" style="color:var(--ink-2)">
+            <li>Wear the required helmet, safety footwear, eye protection, and high-visibility vest.</li>
+            <li>Attend the toolbox talk and follow the supervisor’s site instructions.</li>
+            <li>Keep clear of moving equipment and marked restricted or hazardous zones.</li>
+            <li>Report hazards or injuries to your supervisor immediately; do not rely on an AI screening result.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
     <!-- ===================== WORKER CHECK-IN ===================== -->
     <section id="view-attendance" class="view">
       <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
@@ -1176,6 +1328,6 @@
 
   </main>
 
-  <script defer src="/js/app.js?v=v21-authentication"></script>
+  <script defer src="/js/app.js?v=v25-field-notebook-chart-colors"></script>
 </body>
 </html>

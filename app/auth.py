@@ -10,8 +10,8 @@ from app import database
 
 PASSWORD_ROUNDS = 600_000
 SESSION_LIFETIME = timedelta(hours=8)
-VALID_ROLES = {"admin", "supervisor", "viewer"}
-_USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9._-]{3,32}$")
+VALID_ROLES = {"admin", "supervisor", "viewer", "worker"}
+_USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9._-]{5,32}$")
 
 
 class AuthenticationError(ValueError):
@@ -30,14 +30,29 @@ def _normalise_username(username: str) -> str:
     username = username.strip()
     if not _USERNAME_PATTERN.fullmatch(username):
         raise AuthenticationError(
-            "Username must be 3–32 letters, numbers, dots, hyphens, or underscores."
+            "Username must be 5–32 letters, numbers, dots, hyphens, or underscores."
         )
     return username
 
 
+def normalise_employee_id(employee_id: str) -> str:
+    employee_id = employee_id.strip()
+    if employee_id[:3].upper() != "EMP":
+        raise AuthenticationError("Employee ID must start with EMP, for example EMP001.")
+    digits = employee_id[3:]
+    if not digits.isascii() or not digits.isdigit() or not 1 <= len(digits) <= 8:
+        raise AuthenticationError(
+            "Employee ID must be EMP followed by 1–8 digits, for example EMP001."
+        )
+    number = int(digits)
+    if number == 0:
+        raise AuthenticationError("Employee ID number must be greater than zero.")
+    return f"EMP{number:03d}"
+
+
 def _validate_password(password: str) -> None:
-    if not 12 <= len(password) <= 256:
-        raise AuthenticationError("Password must be 12–256 characters long.")
+    if not 6 <= len(password) <= 256:
+        raise AuthenticationError("Password must be 6–256 characters long.")
     if password.isspace():
         raise AuthenticationError("Password cannot contain only whitespace.")
 
@@ -105,11 +120,16 @@ def create_first_admin(username: str, display_name: str, password: str) -> dict:
 
 def create_user(username: str, display_name: str, password: str, role: str) -> dict:
     username = _normalise_username(username)
+    if role == "worker":
+        normalized_employee_id = normalise_employee_id(username)
+        if username.upper() != normalized_employee_id:
+            raise AuthenticationError("Worker username must use the canonical EMP ID, such as EMP001.")
+        username = normalized_employee_id
     display_name = display_name.strip()
     if not display_name or len(display_name) > 80:
         raise AuthenticationError("Display name must be 1–80 characters.")
     if role not in VALID_ROLES:
-        raise AuthenticationError("Choose admin, supervisor, or viewer.")
+        raise AuthenticationError("Choose admin, supervisor, viewer, or worker.")
     _validate_password(password)
     password_hash, salt, rounds = _password_record(password)
     connection = database._connect()
@@ -203,7 +223,11 @@ def set_user_active(user_id: int, active: bool, acting_user_id: int) -> bool:
         connection.close()
 
 
-def create_session(username: str, password: str) -> tuple[str, dict] | None:
+def create_session(
+    username: str,
+    password: str,
+    expected_role: str | None = None,
+) -> tuple[str, dict] | None:
     username = username.strip()
     expire_sessions()
     connection = database._connect()
@@ -220,6 +244,8 @@ def create_session(username: str, password: str) -> tuple[str, dict] | None:
             _password_matches(password, "0" * 64, "0" * 32, PASSWORD_ROUNDS)
             return None
         if not row[7] or not _password_matches(password, row[3], row[4], row[5]):
+            return None
+        if expected_role is not None and row[6] != expected_role:
             return None
 
         token = secrets.token_urlsafe(32)

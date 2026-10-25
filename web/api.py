@@ -25,7 +25,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.error import URLError
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.request import Request as URLRequest, urlopen
 from uuid import uuid4
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -69,12 +69,12 @@ SESSION_COOKIE_NAME = "sitesentinel_session"
 _login_attempts = defaultdict(deque)
 _login_attempt_lock = threading.Lock()
 _LOGIN_ATTEMPT_LIMIT = 5
-_LOGIN_WINDOW_SECONDS = 15 * 60
+_LOGIN_WINDOW_SECONDS = 60
 
 
 class AccountRequest(BaseModel):
-    username: str = Field(min_length=3, max_length=32)
-    password: str = Field(min_length=12, max_length=256)
+    username: str = Field(min_length=5, max_length=32)
+    password: str = Field(min_length=6, max_length=256)
     display_name: str = Field(default="", max_length=80)
     role: str = Field(default="viewer", max_length=20)
 
@@ -82,6 +82,33 @@ class AccountRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=32)
     password: str = Field(min_length=1, max_length=256)
+    role: str | None = Field(default=None, max_length=20)
+
+
+class WorkerRegistrationRequest(BaseModel):
+    employee_id: str = Field(min_length=4, max_length=11)
+    display_name: str = Field(min_length=1, max_length=80)
+    password: str = Field(min_length=6, max_length=256)
+    invite_code: str = Field(min_length=1, max_length=256)
+
+
+class VisitorRegistrationRequest(BaseModel):
+    username: str = Field(min_length=5, max_length=32)
+    display_name: str = Field(min_length=1, max_length=80)
+    password: str = Field(min_length=6, max_length=256)
+
+
+class WorkerSiteInfoRequest(BaseModel):
+    emergency_contact: str = Field(default="", max_length=80)
+    first_aid_location: str = Field(default="", max_length=160)
+    assembly_point: str = Field(default="", max_length=160)
+    site_notice: str = Field(default="", max_length=1000)
+
+
+class WorkerHazardReportRequest(BaseModel):
+    report_type: str = Field(min_length=1, max_length=40)
+    location: str = Field(min_length=1, max_length=120)
+    description: str = Field(min_length=1, max_length=1000)
 
 
 class UserStatusRequest(BaseModel):
@@ -124,7 +151,7 @@ def _check_login_rate_limit(client_key: str) -> None:
         if len(attempts) >= _LOGIN_ATTEMPT_LIMIT:
             raise HTTPException(
                 status_code=429,
-                detail="Too many sign-in attempts. Wait 15 minutes before trying again.",
+                detail="Too many sign-in attempts. Wait 1 minute before trying again.",
             )
         attempts.append(now)
 
@@ -141,6 +168,8 @@ async def require_authenticated_api(request: Request, call_next):
         "/api/auth/status",
         "/api/auth/setup",
         "/api/auth/login",
+        "/api/auth/worker-register",
+        "/api/auth/visitor-register",
         "/api/auth/logout",
         "/api/health",
     }
@@ -152,6 +181,27 @@ async def require_authenticated_api(request: Request, call_next):
                 content={"detail": "Sign in to continue.", "code": "authentication_required"},
             )
         request.state.user = user
+        if user["role"] == "worker":
+            allowed_worker_reads = {
+                "/api/attendance/me",
+                "/api/attendance/today",
+                "/api/worker/site-info",
+                "/api/environment/states",
+                "/api/environment/locations",
+                "/api/environment/current",
+                "/api/environment/scenario",
+            }
+            if not (
+                request.method == "GET" and path in allowed_worker_reads
+                or request.method == "POST" and path in {
+                    "/api/attendance/check-in",
+                    "/api/worker/hazard-reports",
+                }
+            ):
+                return JSONResponse(
+                    status_code=403,
+                    content={"detail": "Workers can access only their own check-in and environmental information."},
+                )
         if request.method not in {"GET", "HEAD", "OPTIONS"} and user["role"] == "viewer":
             return JSONResponse(
                 status_code=403,
@@ -181,6 +231,11 @@ async def require_authenticated_api(request: Request, call_next):
             return JSONResponse(
                 status_code=401,
                 content={"detail": "Sign in to access sample media.", "code": "authentication_required"},
+            )
+        if user["role"] == "worker":
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Sample review media is available only to project staff."},
             )
 
     return await call_next(request)
@@ -373,12 +428,66 @@ def api_auth_setup(payload: AccountRequest, request: Request, response: Response
 def api_auth_login(payload: LoginRequest, request: Request, response: Response):
     client_key = request.client.host if request.client else "unknown"
     _check_login_rate_limit(client_key)
-    authenticated = auth.create_session(payload.username, payload.password)
+    authenticated = auth.create_session(payload.username, payload.password, payload.role)
     if authenticated is None:
         raise HTTPException(status_code=401, detail="Username or password is incorrect.")
     with _login_attempt_lock:
         _login_attempts.pop(client_key, None)
     token, user = authenticated
+    _set_session_cookie(response, request, token)
+    return {"user": user}
+
+
+@app.post("/api/auth/worker-register")
+def api_auth_worker_register(
+    payload: WorkerRegistrationRequest,
+    request: Request,
+    response: Response,
+):
+    client_key = request.client.host if request.client else "unknown"
+    _check_login_rate_limit(client_key)
+    configured_code = os.environ.get("SITESENTINEL_WORKER_INVITE_CODE")
+    if not configured_code:
+        raise HTTPException(
+            status_code=503,
+            detail="Worker registration is not enabled. Ask the site administrator for setup.",
+        )
+    if not secrets.compare_digest(payload.invite_code, configured_code):
+        raise HTTPException(status_code=403, detail="The worker invitation code is invalid.")
+
+    try:
+        employee_id = auth.normalise_employee_id(payload.employee_id)
+        auth.create_user(employee_id, payload.display_name, payload.password, "worker")
+    except auth.AuthenticationError as error:
+        raise HTTPException(status_code=error.status_code, detail=str(error))
+    authenticated = auth.create_session(employee_id, payload.password, "worker")
+    if authenticated is None:
+        raise HTTPException(status_code=500, detail="The worker account was created but could not be signed in.")
+    token, user = authenticated
+    with _login_attempt_lock:
+        _login_attempts.pop(client_key, None)
+    _set_session_cookie(response, request, token)
+    return {"user": user}
+
+
+@app.post("/api/auth/visitor-register")
+def api_auth_visitor_register(
+    payload: VisitorRegistrationRequest,
+    request: Request,
+    response: Response,
+):
+    client_key = request.client.host if request.client else "unknown"
+    _check_login_rate_limit(client_key)
+    try:
+        auth.create_user(payload.username, payload.display_name, payload.password, "viewer")
+    except auth.AuthenticationError as error:
+        raise HTTPException(status_code=error.status_code, detail=str(error))
+    authenticated = auth.create_session(payload.username, payload.password, "viewer")
+    if authenticated is None:
+        raise HTTPException(status_code=500, detail="The visitor account was created but could not be signed in.")
+    token, user = authenticated
+    with _login_attempt_lock:
+        _login_attempts.pop(client_key, None)
     _set_session_cookie(response, request, token)
     return {"user": user}
 
@@ -455,11 +564,17 @@ def api_health():
 
 @app.post("/api/attendance/check-in")
 async def api_attendance_check_in(
+    request: Request,
     employee_id: str = Form(...),
     file: UploadFile = File(...),
 ):
     """Run an in-memory PPE check and persist only the employee ID and text findings."""
     employee_id = employee_id.strip()
+    user = request.state.user
+    if user["role"] == "worker":
+        if employee_id.upper() != user["username"].upper():
+            raise HTTPException(status_code=403, detail="Workers can check in only under their own employee ID.")
+        employee_id = user["username"]
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,32}", employee_id):
         raise HTTPException(
             status_code=422,
@@ -533,6 +648,84 @@ def api_attendance_records():
     return {"records": database.get_attendance_records()}
 
 
+@app.get("/api/attendance/me")
+def api_attendance_my_records(request: Request):
+    user = request.state.user
+    if user["role"] != "worker":
+        raise HTTPException(status_code=403, detail="This endpoint is for worker accounts.")
+    return {"records": database.get_employee_attendance_records(user["username"])}
+
+
+@app.get("/api/attendance/today")
+def api_attendance_today(request: Request):
+    user = request.state.user
+    if user["role"] != "worker":
+        raise HTTPException(status_code=403, detail="This endpoint is for worker accounts.")
+    return {"record": database.get_employee_attendance_today(user["username"])}
+
+
+@app.get("/api/worker/site-info")
+def api_worker_site_info():
+    return database.get_worker_site_info()
+
+
+@app.put("/api/worker/site-info")
+def api_update_worker_site_info(
+    payload: WorkerSiteInfoRequest,
+    request: Request,
+):
+    if request.state.user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only administrators can update worker site information.")
+    values = {
+        key: value.strip()
+        for key, value in payload.model_dump().items()
+    }
+    if any(any(ord(char) < 32 and char not in "\n\t" for char in value) for value in values.values()):
+        raise HTTPException(status_code=422, detail="Site information cannot contain control characters.")
+    try:
+        return database.save_worker_site_info(**values)
+    except Exception:
+        logger.exception("Could not save worker site information.")
+        raise HTTPException(status_code=500, detail="Worker site information could not be saved.")
+
+
+@app.post("/api/worker/hazard-reports")
+def api_worker_hazard_report(
+    payload: WorkerHazardReportRequest,
+    request: Request,
+):
+    user = request.state.user
+    if user["role"] != "worker":
+        raise HTTPException(status_code=403, detail="This endpoint is for worker accounts.")
+    report_types = {
+        "hazard": "WORKER_HAZARD_REPORT",
+        "near_miss": "WORKER_NEAR_MISS_REPORT",
+        "injury": "WORKER_INJURY_REPORT",
+    }
+    report_type = payload.report_type.strip().lower()
+    location = payload.location.strip()
+    description = payload.description.strip()
+    if report_type not in report_types:
+        raise HTTPException(status_code=422, detail="Choose hazard, near miss, or injury.")
+    if not location or len(location) > 120:
+        raise HTTPException(status_code=422, detail="Location is required and must be 120 characters or fewer.")
+    if not description or len(description) > 1000:
+        raise HTTPException(status_code=422, detail="Description is required and must be 1000 characters or fewer.")
+    if any(ord(char) < 32 and char not in "\n\t" for char in location + description):
+        raise HTTPException(status_code=422, detail="Report text cannot contain control characters.")
+    try:
+        ticket_id = database.create_ticket(
+            hazard_type=report_types[report_type],
+            severity="MODERATE",
+            zone_name=f"Worker report — {location}",
+            description=f"Reported by {user['username']}: {description}",
+        )
+    except Exception:
+        logger.exception("Could not save worker hazard report.")
+        raise HTTPException(status_code=500, detail="Your report could not be saved. Please tell a supervisor directly.")
+    return {"ok": True, "ticket_id": ticket_id}
+
+
 @app.post("/api/attendance/confirm-ticket")
 def api_confirm_attendance_ticket(
     employee_id: str = Form(...),
@@ -568,7 +761,7 @@ def api_confirm_attendance_ticket(
 
 def _fetch_open_meteo_json(service: str, params: dict) -> dict:
     endpoint = OPEN_METEO_ENDPOINTS[service]
-    request = Request(
+    request = URLRequest(
         f"{endpoint}?{urlencode(params)}",
         headers={"User-Agent": "SiteSentinel/1.0 (local environmental dashboard)"},
     )
@@ -1333,7 +1526,8 @@ def api_get_tickets(status: str | None = None):
     df = database.get_tickets(status=status)
     if df.empty:
         return {"tickets": []}
-    return {"tickets": df.to_dict(orient="records")}
+    records = df.astype(object).where(pd.notna(df), None).to_dict(orient="records")
+    return {"tickets": records}
 
 
 @app.post("/api/tickets")
