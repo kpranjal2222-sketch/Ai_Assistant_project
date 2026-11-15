@@ -1,41 +1,57 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SiteSentinel - Construction Safety Review</title>
   <link rel="icon" href="data:," />
 
-  <!-- Set the saved theme BEFORE paint. Default is DARK for industrial command center aesthetics -->
+  <!-- Set the saved theme BEFORE paint. Default is LIGHT (drafting-board theme). -->
   <script>
     (function () {
       try {
         var t = localStorage.getItem("cm-theme-v2");
         if (!t) {
-          t = "dark";
-          localStorage.setItem("cm-theme-v2", "dark");
+          t = "light";
+          localStorage.setItem("cm-theme-v2", "light");
         }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {
-        document.documentElement.setAttribute("data-theme", "dark");
+        document.documentElement.setAttribute("data-theme", "light");
       }
     })();
   </script>
 
-  <link rel="stylesheet" href="/css/tailwind.generated.css?v=v10-reviewed-followup" />
-  <link rel="stylesheet" href="/css/styles.css?v=v26-site-plan-guide" />
-  <script defer src="/vendor/chart.umd.js?v=v19-location-model"></script>
-  <script defer src="/vendor/lucide.min.js?v=v19-location-model"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/css/tailwind.generated.css?v=ui-draft-1" />
+  <link rel="stylesheet" href="/css/styles.css?v=ui-draft-1" />
+  <script defer src="/vendor/chart.umd.js?v=ui-draft-1"></script>
+  <script defer src="/vendor/lucide.min.js?v=ui-draft-1"></script>
 </head>
 
 <body class="min-h-screen">
 
   <section id="authGate" class="auth-gate" aria-labelledby="authGateTitle">
-    <article class="card auth-card">
-      <div class="logo-badge"><i data-lucide="shield-check"></i></div>
-      <span class="site-map-kicker mt-3">SITESENTINEL / ACCOUNT ACCESS</span>
-      <h1 id="authGateTitle" class="text-2xl font-bold mt-1">Secure project access</h1>
-      <p id="authGateIntro" class="text-sm mt-2" style="color:var(--ink-2)">Sign in to access project records and review tools.</p>
+    <article class="auth-card draft-frame">
+      <!-- Access strip -->
+      <div class="terminal-led-strip">
+        <div class="flex items-center gap-2">
+          <span class="status-led online"></span>
+          <span class="terminal-stencil text-[10px]">SITESENTINEL · SECURE ACCESS</span>
+        </div>
+        <span class="text-[9px] font-mono opacity-60">LOCAL SESSION</span>
+      </div>
+
+      <div class="flex items-center gap-3 mt-1 mb-2">
+        <div class="logo-badge"><i data-lucide="shield-check"></i></div>
+        <div>
+          <h1 id="authGateTitle" class="text-xl font-bold font-display">Secure project access</h1>
+          <p id="authGateIntro" class="text-xs" style="color:var(--ink-2)">Sign in to access project records and review tools.</p>
+        </div>
+      </div>
       <form id="authLoginForm" class="auth-form hidden">
         <label for="authLoginRole">Sign in as</label>
         <select id="authLoginRole" name="role" required>
@@ -48,8 +64,10 @@
         <input id="authLoginUsername" name="username" autocomplete="username" required maxlength="32" />
         <label for="authLoginPassword">Password</label>
         <input id="authLoginPassword" name="password" type="password" autocomplete="current-password" required maxlength="256" />
-        <button class="btn-primary justify-center mt-2" type="submit">Sign in</button>
-        <button id="authRegisterLink" class="btn-ghost justify-center" type="button">Need an account? Register</button>
+        <button class="btn-primary justify-center mt-2 font-mono text-xs font-semibold" type="submit">
+          <i data-lucide="lock" class="w-3.5 h-3.5 inline mr-1"></i>Sign in
+        </button>
+        <button id="authRegisterLink" class="btn-ghost justify-center font-mono text-xs" type="button">Need an account? Register</button>
       </form>
       <form id="authRegisterForm" class="auth-form hidden">
         <label for="authRegisterRole">Account type</label>
@@ -78,9 +96,11 @@
             <label for="authRegisterInviteCode">Site invitation code</label>
             <input id="authRegisterInviteCode" name="invite_code" type="password" autocomplete="off" maxlength="256" />
           </div>
-          <button id="authRegisterSubmit" class="btn-primary justify-center mt-2" type="submit">Register visitor account</button>
+          <button id="authRegisterSubmit" class="btn-primary justify-center mt-2 font-mono text-xs font-semibold" type="submit">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5 inline mr-1"></i>Register visitor account
+          </button>
         </div>
-        <button id="authRegisterLoginLink" class="btn-ghost justify-center" type="button">Already have an account? Sign in</button>
+        <button id="authRegisterLoginLink" class="btn-ghost justify-center font-mono text-xs" type="button">Already have an account? Sign in</button>
       </form>
       <form id="authSetupForm" class="auth-form hidden">
         <p class="auth-setup-note">Create your project account. Use a username with at least 5 characters and a password with at least 6.</p>
@@ -92,7 +112,9 @@
         <input id="authSetupPassword" name="password" type="password" autocomplete="new-password" required minlength="6" maxlength="256" />
         <label for="authSetupToken" id="authSetupTokenLabel" class="hidden">One-time setup token</label>
         <input id="authSetupToken" name="setup_token" class="hidden" autocomplete="off" />
-        <button class="btn-primary justify-center mt-2" type="submit">Create administrator</button>
+        <button class="btn-primary justify-center mt-2 font-mono text-xs font-semibold" type="submit">
+          <i data-lucide="shield" class="w-3.5 h-3.5 inline mr-1"></i>Create administrator
+        </button>
       </form>
       <p id="authMessage" class="text-sm mt-3" role="status" aria-live="polite"></p>
       <p class="auth-privacy-note">Accounts use server-side password hashing and expiring, HTTP-only sessions. Keep this local app bound to a trusted interface.</p>
@@ -106,36 +128,47 @@
         <button class="icon-btn" id="menuToggle" title="Menu" aria-label="Open navigation menu">
           <i data-lucide="menu"></i>
         </button>
-        <a class="nav-logo flex items-center gap-2.5 font-bold text-lg cursor-pointer" data-view="landing">
+        <a class="nav-logo flex items-center gap-2.5 font-bold text-lg cursor-pointer" data-view="dashboard">
           <span class="logo-badge"><i data-lucide="shield-check"></i></span>
           <div class="leading-tight">
             <div class="flex items-center gap-1.5">
-              <span class="tracking-tight font-display font-bold">SiteSentinel</span>
-              <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">FIELD REVIEW</span>
+              <span class="tracking-tight font-display font-bold">SITESENTINEL</span>
+              <span class="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">FIELD UNIT 04</span>
             </div>
-            <div class="text-[9px] font-mono tracking-wider text-[var(--ink-2)] uppercase">CONSTRUCTION / SAFETY</div>
+            <div class="text-[9px] font-mono tracking-wider opacity-70 uppercase">DAY SHIFT 07:00–15:30</div>
           </div>
         </a>
       </div>
 
+      <!-- Quick Command Bar Indicator (Option A & Screenshot) -->
+      <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-xs font-mono opacity-85 cursor-pointer hover:border-[var(--orange)] transition-colors" id="commandBarTrigger" onclick="showView('dashboard')">
+        <i data-lucide="search" class="w-3.5 h-3.5 opacity-60"></i>
+        <span class="text-[11px] opacity-75">Search or jump to...</span>
+        <span class="text-[10px] px-1 py-0.2 rounded bg-black/10 dark:bg-white/10 font-mono ml-3 opacity-60">⌘K</span>
+      </div>
+
       <!-- Desktop Navigation Bar -->
-      <nav id="topbarNav" class="items-center gap-1 font-mono text-xs" aria-label="Primary">
-        <a class="nav-link" data-view="sentinel" title="Frame Review"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>Frame Review</a>
-        <a class="nav-link" data-view="map" title="Site Map"><i data-lucide="map" class="w-3.5 h-3.5"></i>Site Map</a>
+      <nav id="topbarNav" class="items-center gap-1 font-mono text-xs hidden md:flex" aria-label="Primary">
+        <a class="nav-link" data-view="dashboard" title="Overview"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>Dashboard</a>
+        <a class="nav-link" data-view="attendance" title="Check-in"><i data-lucide="user-check" class="w-3.5 h-3.5"></i>Workers</a>
         <a class="nav-link" data-view="tickets" title="Incidents"><i data-lucide="ticket" class="w-3.5 h-3.5"></i>Incidents</a>
+        <a class="nav-link" data-view="sentinel" title="Frame Review"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>Inspection AI</a>
+        <a class="nav-link" data-view="map" title="Site Map"><i data-lucide="map" class="w-3.5 h-3.5"></i>Site Map</a>
         <a class="nav-link" data-view="air-quality" title="Air Quality"><i data-lucide="wind" class="w-3.5 h-3.5"></i>Air Quality</a>
-        <a class="nav-link" data-view="dashboard" title="Overview"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>Overview</a>
-        <a class="nav-link" data-view="worker-dashboard" title="Worker Home"><i data-lucide="hard-hat" class="w-3.5 h-3.5"></i>Worker Home</a>
-        <a class="nav-link" data-view="attendance" title="Check-in"><i data-lucide="user-check" class="w-3.5 h-3.5"></i>Check-in</a>
-        <a class="nav-link" data-view="detect" title="Photo Review"><i data-lucide="camera" class="w-3.5 h-3.5"></i>Photo Review</a>
-        <a class="nav-link" data-view="video" title="Video Review"><i data-lucide="video" class="w-3.5 h-3.5"></i>Video Review</a>
         <a class="nav-link" data-view="tracker" title="Progress"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>Progress</a>
         <a class="nav-link" data-view="reports" title="Reports"><i data-lucide="file-text" class="w-3.5 h-3.5"></i>Reports</a>
+        <a class="nav-link hidden" data-view="worker-dashboard" title="Worker Home"><i data-lucide="hard-hat" class="w-3.5 h-3.5"></i>Worker Home</a>
+        <a class="nav-link hidden" data-view="detect" title="Photo Review"><i data-lucide="camera" class="w-3.5 h-3.5"></i>Photo AI</a>
+        <a class="nav-link hidden" data-view="video" title="Video Review"><i data-lucide="video" class="w-3.5 h-3.5"></i>Video AI</a>
       </nav>
 
       <div class="flex items-center gap-2.5">
-        <div id="topbarRiskBadge" class="hud-pill info hidden md:inline-flex cursor-pointer text-[11px] font-mono" onclick="showView('dashboard')">
-          <i data-lucide="activity" class="w-3.5 h-3.5"></i> TICKET RISK: <span id="topbarRiskScore" class="font-bold">--</span>
+        <span class="hidden xl:inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--surface-2)] border border-[var(--border)] text-xs font-mono">
+          <span class="status-led online"></span>
+          <span class="text-[10px] font-bold text-emerald-500">SYSTEM READY</span>
+        </span>
+        <div id="topbarRiskBadge" class="hud-pill info hidden md:inline-flex cursor-pointer text-[11px] font-mono items-center gap-1" onclick="showView('dashboard')">
+          <span class="status-led warn"></span> TICKET RISK: <span id="topbarRiskScore" class="font-bold">--</span>
         </div>
         <span id="signedInUser" class="signed-in-user hidden"></span>
         <button id="manageUsersButton" class="btn-ghost account-action hidden" type="button">Accounts</button>
@@ -146,6 +179,56 @@
       </div>
     </div>
   </header>
+
+  <!-- ===================== LEFT SIDEBAR (DESKTOP) ===================== -->
+  <aside class="app-sidebar" id="appSidebar" aria-label="Primary navigation">
+    <nav class="sidebar-nav">
+      <a class="sidebar-link active" data-view="dashboard" title="Dashboard">
+        <i data-lucide="layout-dashboard" class="sidebar-icon"></i>
+        <span>DASHBOARD</span>
+      </a>
+      <a class="sidebar-link" data-view="detect" title="Photo Safety AI">
+        <i data-lucide="camera" class="sidebar-icon"></i>
+        <span>PHOTO CHECKER</span>
+      </a>
+      <a class="sidebar-link" data-view="video" title="Video Detection AI">
+        <i data-lucide="film" class="sidebar-icon"></i>
+        <span>VIDEO CHECKER</span>
+      </a>
+      <a class="sidebar-link" data-view="sentinel" title="Live Frame Review & CCTV">
+        <i data-lucide="shield-alert" class="sidebar-icon"></i>
+        <span>FRAME REVIEW</span>
+      </a>
+      <a class="sidebar-link" data-view="attendance" title="Workers Check-in">
+        <i data-lucide="user-check" class="sidebar-icon"></i>
+        <span>WORKERS</span>
+      </a>
+      <a class="sidebar-link" data-view="tickets" title="Incidents">
+        <i data-lucide="triangle-alert" class="sidebar-icon"></i>
+        <span>INCIDENTS</span>
+      </a>
+      <a class="sidebar-link" data-view="map" title="Site Map">
+        <i data-lucide="map" class="sidebar-icon"></i>
+        <span>SITE MAP</span>
+      </a>
+      <a class="sidebar-link" data-view="air-quality" title="Air Quality">
+        <i data-lucide="wind" class="sidebar-icon"></i>
+        <span>AIR QUALITY</span>
+      </a>
+      <a class="sidebar-link" data-view="tracker" title="Progress">
+        <i data-lucide="bar-chart-3" class="sidebar-icon"></i>
+        <span>PROGRESS</span>
+      </a>
+      <a class="sidebar-link" data-view="reports" title="Reports">
+        <i data-lucide="file-text" class="sidebar-icon"></i>
+        <span>REPORTS</span>
+      </a>
+      <a class="sidebar-link hidden" data-view="worker-dashboard" title="Worker Home">
+        <i data-lucide="hard-hat" class="sidebar-icon"></i>
+        <span>WORKER HOME</span>
+      </a>
+    </nav>
+  </aside>
 
   <!-- ===================== SLIDE-IN NAV DRAWER (MOBILE) ===================== -->
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
@@ -210,11 +293,11 @@
     </article>
   </section>
 
-  <main class="max-w-7xl mx-auto px-4 py-6">
+  <main class="app-main max-w-7xl mx-auto px-4 py-6">
 
     <!-- ===================== PROJECT OVERVIEW ===================== -->
     <section id="view-landing" class="view active">
-      <div class="hero">
+      <div class="hero draft-frame">
         <div class="hero-layout">
           <div class="hero-copy">
             <div class="eyebrow"><span class="eyebrow-mark"></span> SITE SENTINEL / FIELD REVIEW</div>
@@ -844,46 +927,157 @@
 
     <!-- ===================== DASHBOARD ===================== -->
     <section id="view-dashboard" class="view">
-      <h1 class="text-xl font-bold mb-1">Project overview</h1>
-      <p class="text-sm mb-4" style="color:var(--ink-2)">Saved inspection history, incident follow-up, and planned work progress.</p>
+      <!-- Tactical Command Center Header -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-mono tracking-wider opacity-70 mb-0.5">
+            <span class="status-led online"></span> SITESENTINEL // FIELD OPERATIONS COMMAND
+          </div>
+          <h1 class="text-2xl font-bold font-display">Field Safety &amp; Project Overview</h1>
+          <p class="text-xs" style="color:var(--ink-2)">Real-time safety telemetry, active worker checks, incident follow-up, and shift readiness interlock.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono px-2.5 py-1 rounded bg-[var(--surface-2)] border border-[var(--border)] opacity-85">
+            <i data-lucide="clock" class="w-3.5 h-3.5 inline mr-1"></i> SHIFT A • ACTIVE
+          </span>
+          <button class="btn-ghost text-xs font-mono" type="button" data-view="detect">
+            <i data-lucide="camera" class="w-3.5 h-3.5 inline mr-1"></i> Photo AI
+          </button>
+          <button class="btn-ghost text-xs font-mono" type="button" data-view="video">
+            <i data-lucide="film" class="w-3.5 h-3.5 inline mr-1"></i> Video AI
+          </button>
+          <button class="btn-ghost text-xs font-mono" type="button" data-view="attendance">
+            <i data-lucide="user-check" class="w-3.5 h-3.5 inline mr-1"></i> Check-in
+          </button>
+          <button class="btn-primary text-xs font-mono" type="button" data-view="tickets">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 inline mr-1"></i> Incident Log
+          </button>
+        </div>
+      </div>
 
       <!-- Ticket-based project risk summary -->
       <div class="card p-4 mb-5 border-l-4 border-l-emerald-500" id="oshaRiskCard">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div class="space-y-1">
-            <div class="text-xs uppercase font-mono tracking-wider" style="color:var(--ink-2)">Ticket-based risk indicator</div>
+            <div class="flex items-center gap-2 text-xs uppercase font-mono tracking-wider" style="color:var(--ink-2)">
+              <span class="status-led online" id="dashRiskLed"></span> TICKET-BASED RISK INTERLOCK
+            </div>
             <div class="flex items-center gap-3">
               <span class="text-3xl font-bold font-mono" id="dashRiskScore">—</span>
-              <span class="hud-pill info" id="dashRiskRating">NO TICKET DATA YET</span>
+              <span class="hud-pill info font-mono text-xs" id="dashRiskRating">NO TICKET DATA YET</span>
             </div>
             <p class="text-xs" style="color:var(--ink-2)">A project-defined score based only on open and investigating incident tickets. It is not an OSHA score or a live hazard assessment.</p>
           </div>
           <div class="flex flex-wrap gap-2 text-xs font-mono">
             <div class="px-3 py-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-center">
               <div class="text-[10px]" style="color:var(--ink-2)">Catastrophic</div>
-              <div class="font-bold text-red-500" id="dashRiskCatastrophic">0</div>
+              <div class="font-bold text-red-500 text-sm" id="dashRiskCatastrophic">0</div>
             </div>
             <div class="px-3 py-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-center">
-                <div class="text-[10px]" style="color:var(--ink-2)">High</div>
-                <div class="font-bold text-orange-500" id="dashRiskHigh">0</div>
-              </div>
-              <div class="px-3 py-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div class="text-[10px]" style="color:var(--ink-2)">High</div>
+              <div class="font-bold text-orange-500 text-sm" id="dashRiskHigh">0</div>
+            </div>
+            <div class="px-3 py-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-center">
               <div class="text-[10px]" style="color:var(--ink-2)">Critical</div>
-              <div class="font-bold text-amber-500" id="dashRiskCritical">0</div>
+              <div class="font-bold text-amber-500 text-sm" id="dashRiskCritical">0</div>
             </div>
             <div class="px-3 py-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-center">
               <div class="text-[10px]" style="color:var(--ink-2)">Remediated</div>
-              <div class="font-bold text-emerald-500" id="dashRiskRemediated">0</div>
+              <div class="font-bold text-emerald-500 text-sm" id="dashRiskRemediated">0</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5" id="kpis">
-        <!-- KPI tiles injected -->
+      <!-- ===================== 3-MODULE HARDWARE COCKPIT (OPTION F + SCREWS) ===================== -->
+      <div class="cockpit-grid">
+        <!-- Module 1: Safety Benchmark & Segmented Compliance Meter -->
+        <div class="cockpit-module draft-frame">
+
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="cockpit-bezel">
+              <span class="stat-value text-2xl font-mono" id="cockpitComplianceVal">—</span>
+            </div>
+            <div class="text-right">
+              <div class="terminal-stencil text-[9px] opacity-75">SAFETY BENCHMARK</div>
+              <div class="text-[10px] font-mono opacity-60">FIELD PPE STANDARD</div>
+            </div>
+          </div>
+          <div>
+            <div class="segmented-meter" id="cockpitSegmentedMeter" aria-hidden="true">
+              <span class="segment lit-good"></span><span class="segment lit-good"></span><span class="segment lit-good"></span>
+              <span class="segment lit-good"></span><span class="segment lit-good"></span><span class="segment lit-good"></span>
+              <span class="segment lit-good"></span><span class="segment lit-good"></span><span class="segment lit-good"></span>
+              <span class="segment"></span>
+            </div>
+            <div class="flex justify-between items-center text-[10px] font-mono opacity-60 mt-1">
+              <span>COMPLIANCE</span>
+              <span id="cockpitComplianceLabel">Awaiting telemetry</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Module 2: Onsite Personnel Counter -->
+        <div class="cockpit-module text-center">
+
+          <div class="flex justify-between items-center text-[10px] font-mono opacity-60 mb-2">
+            <span class="tracking-widest">ONSITE REGISTER</span>
+            <span class="status-led online" title="Register sync"></span>
+          </div>
+          <div class="my-auto py-1">
+            <div class="inline-flex items-center justify-center p-2 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+              <div class="tally-display" id="cockpitTallyDisplay">
+                <span class="split-digit">0</span><span class="split-digit">0</span><span class="split-digit">0</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-[11px] font-mono font-bold tracking-widest uppercase opacity-75 mt-2">
+            ONSITE PERSONNEL
+          </div>
+        </div>
+
+        <!-- Module 3: Pre-Shift Readiness Toggles -->
+        <div class="cockpit-module">
+
+          <div class="flex justify-between items-center text-[10px] font-mono opacity-70 mb-2">
+            <span class="terminal-stencil text-[9px]">SHIFT READINESS</span>
+            <span id="cockpitPreShiftBadge" class="hud-pill info text-[10px] font-mono">STANDBY</span>
+          </div>
+          <div class="space-y-1.5 my-auto" id="cockpitToggleGroup">
+            <label class="tactile-switch-label py-1 px-2.5">
+              <span class="font-mono text-[11px] font-bold">HEADCOUNT</span>
+              <div class="tactile-switch-control">
+                <input type="checkbox" id="cockpitHeadcount" onchange="syncPreShiftToggle(this, 'headcount_ready')">
+                <span class="tactile-switch-track"><span class="tactile-switch-thumb"></span></span>
+              </div>
+            </label>
+            <label class="tactile-switch-label py-1 px-2.5">
+              <span class="font-mono text-[11px] font-bold">TOOLBOX TALK</span>
+              <div class="tactile-switch-control">
+                <input type="checkbox" id="cockpitToolbox" onchange="syncPreShiftToggle(this, 'toolbox_talk')">
+                <span class="tactile-switch-track"><span class="tactile-switch-thumb"></span></span>
+              </div>
+            </label>
+            <label class="tactile-switch-label py-1 px-2.5">
+              <span class="font-mono text-[11px] font-bold">PPE CHECK</span>
+              <div class="tactile-switch-control">
+                <input type="checkbox" id="cockpitPpe" onchange="syncPreShiftToggle(this, 'ppe_inspected')">
+                <span class="tactile-switch-track"><span class="tactile-switch-thumb"></span></span>
+              </div>
+            </label>
+          </div>
+          <div class="flex justify-between items-center text-[10px] font-mono opacity-60 mt-1">
+            <span>INTERLOCK: <strong class="text-emerald-500">ENGAGED</strong></span>
+            <button class="btn-ghost text-[10px] py-0.5 px-1.5 font-mono" type="button" onclick="submitCockpitPreShift()">Save</button>
+          </div>
+        </div>
       </div>
 
-      <div class="grid lg:grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5" id="kpis">
+        <!-- KPI tiles injected with tactile hardware meters -->
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-4 mb-5">
         <article class="card p-4">
           <div class="flex items-start justify-between gap-3 mb-3">
             <div>
@@ -908,44 +1102,108 @@
         <article class="card p-4">
           <div class="flex items-start justify-between gap-3 mb-3">
             <div>
-              <h2 class="font-semibold text-sm">Pre-shift readiness</h2>
-              <p class="text-xs mt-1" style="color:var(--ink-2)">Daily start-of-shift checks, saved for today.</p>
+              <h2 class="font-semibold text-sm">Pre-shift readiness interlock</h2>
+              <p class="text-xs mt-1" style="color:var(--ink-2)">Daily start-of-shift safety verification protocol.</p>
             </div>
             <span class="hud-pill info" id="preShiftSummary">Not recorded</span>
           </div>
           <form id="preShiftForm" class="grid sm:grid-cols-2 gap-2 text-sm">
-            <label class="flex items-center gap-2"><input type="checkbox" name="headcount_ready"> Headcount accounted for</label>
-            <label class="flex items-center gap-2"><input type="checkbox" name="toolbox_talk"> Toolbox talk completed</label>
-            <label class="flex items-center gap-2"><input type="checkbox" name="ppe_inspected"> PPE inspected</label>
-            <label class="flex items-center gap-2"><input type="checkbox" name="equipment_checked"> Equipment pre-start checked</label>
-            <label class="flex items-center gap-2"><input type="checkbox" name="access_clear"> Emergency access clear</label>
-            <label class="text-xs">Checked by (optional employee ID)
-              <input class="btn-ghost w-full mt-1" name="checked_by" maxlength="32" autocomplete="off">
+            <label class="tactile-switch-label">
+              <span class="font-mono text-xs font-medium">Headcount accounted</span>
+              <div class="tactile-switch-control">
+                <input type="checkbox" name="headcount_ready">
+                <span class="tactile-switch-track"><span class="tactile-switch-thumb"></span></span>
+              </div>
             </label>
-            <button class="btn-primary sm:col-span-2 justify-center" type="submit">Save today's readiness check</button>
+            <label class="tactile-switch-label">
+              <span class="font-mono text-xs font-medium">Toolbox talk verified</span>
+              <div class="tactile-switch-control">
+                <input type="checkbox" name="toolbox_talk">
+                <span class="tactile-switch-track"><span class="tactile-switch-thumb"></span></span>
+              </div>
+            </label>
+            <label class="tactile-switch-label">
+              <span class="font-mono text-xs font-medium">PPE pre-inspected</span>
+              <div class="tactile-switch-control">
+                <input type="checkbox" name="ppe_inspected">
+                <span class="tactile-switch-track"><span class="tactile-switch-thumb"></span></span>
+              </div>
+            </label>
+            <label class="tactile-switch-label">
+              <span class="font-mono text-xs font-medium">Equipment checked</span>
+              <div class="tactile-switch-control">
+                <input type="checkbox" name="equipment_checked">
+                <span class="tactile-switch-track"><span class="tactile-switch-thumb"></span></span>
+              </div>
+            </label>
+            <label class="tactile-switch-label sm:col-span-2">
+              <span class="font-mono text-xs font-medium">Emergency access routes clear</span>
+              <div class="tactile-switch-control">
+                <input type="checkbox" name="access_clear">
+                <span class="tactile-switch-track"><span class="tactile-switch-thumb"></span></span>
+              </div>
+            </label>
+            <div class="sm:col-span-2 flex flex-wrap items-end gap-2 mt-1">
+              <label class="text-xs font-mono flex-1">
+                <span style="color:var(--ink-2)">Checked by (optional employee ID):</span>
+                <input class="btn-ghost w-full mt-1 font-mono text-xs" name="checked_by" maxlength="32" autocomplete="off" placeholder="e.g. EMP001">
+              </label>
+              <button class="btn-primary sm:col-span-2 justify-center font-mono text-xs" type="submit">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 inline mr-1"></i>Save today's readiness check
+              </button>
+            </div>
           </form>
           <p id="preShiftMessage" class="text-xs mt-2" role="status" aria-live="polite"></p>
         </article>
       </div>
 
-      <article class="card p-4 mb-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 class="font-semibold text-sm">Today's worker check-ins</h2>
-            <p class="text-xs mt-1" style="color:var(--ink-2)">Only employee ID, time, status, and text findings are retained. Photos are not saved. Confirm a flagged concern only after an in-person check.</p>
+      <!-- ===================== PERSONNEL CHECK-IN LOG ===================== -->
+      <article class="personnel-log-panel mb-5">
+        <div class="personnel-log-header">
+          <div class="flex items-center gap-2.5">
+            <span class="status-led online"></span>
+            <h2 class="font-bold text-sm uppercase font-mono tracking-wider">PERSONNEL CHECK-IN LOG</h2>
           </div>
           <div class="flex items-center gap-3">
-            <span class="text-xs font-mono" id="attendanceSummary">Loading...</span>
-            <button class="btn-ghost text-xs" type="button" data-view="attendance">Open check-in</button>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)]" id="attendanceSummary">Loading...</span>
+            <button class="btn-ghost text-xs font-mono" type="button" data-view="attendance">
+              <i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Open Check-in
+            </button>
           </div>
         </div>
-        <div class="overflow-x-auto mt-3">
-          <table class="data text-xs">
-            <thead><tr><th>Employee ID</th><th>Time</th><th>Screening status</th><th>Text findings</th><th>Supervisor action</th></tr></thead>
-            <tbody id="attendanceTbody"><tr><td colspan="5" class="text-center p-3">Loading check-ins...</td></tr></tbody>
+
+        <div class="personnel-table-wrap">
+          <table class="personnel-table" id="personnelCheckInTable">
+            <thead>
+              <tr>
+                <th>WORKER</th>
+                <th>BADGE</th>
+                <th>ZONE</th>
+                <th>CHECK-IN</th>
+                <th>PPE STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="personnelCheckInTbody">
+              <tr>
+                <td colspan="5" class="text-center py-8 text-xs font-mono" style="color:var(--muted)">
+                  Loading check-ins…
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
-        <p id="attendanceActionStatus" class="text-xs mt-2" role="status" aria-live="polite"></p>
+
+        <!-- Hidden legacy table to preserve DOM bindings -->
+        <table class="sr-only" aria-hidden="true">
+          <tbody id="attendanceTbody"></tbody>
+        </table>
+
+        <!-- Keep the old receipt stream element but hidden (referenced by old JS) -->
+        <div id="attendanceReceiptStream" class="hidden" aria-hidden="true"></div>
+
+        <div class="px-4 py-2 bg-[var(--surface-2)] border-t border-[var(--border)]">
+          <p id="attendanceActionStatus" class="text-xs font-mono" role="status" aria-live="polite"></p>
+        </div>
       </article>
 
       <dialog id="attendanceConfirmDialog" class="site-confirm-dialog">
@@ -997,7 +1255,7 @@
     </section>
 
     <section id="view-worker-dashboard" class="view">
-      <div class="worker-welcome mb-5">
+      <div class="worker-welcome draft-frame mb-5">
         <div class="worker-welcome-copy">
           <p class="text-[10px] font-mono tracking-widest uppercase">SiteSentinel / Shift start</p>
           <h1>Before you step onto site.</h1>
@@ -1328,6 +1586,6 @@
 
   </main>
 
-  <script defer src="/js/app.js?v=v25-field-notebook-chart-colors"></script>
+  <script defer src="/js/app.js?v=ui-draft-1"></script>
 </body>
 </html>

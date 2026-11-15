@@ -165,6 +165,13 @@ function applyRoleNavigation() {
         ? "none"
         : "";
   });
+  // Also apply to the left sidebar links
+  $$(".sidebar-link").forEach((link) => {
+    link.style.display =
+      currentUser?.role === "worker" && !workerViews.has(link.dataset.view)
+        ? "none"
+        : "";
+  });
   $("#topbarRiskBadge").style.display = currentUser?.role === "worker" ? "none" : "";
 }
 
@@ -270,7 +277,7 @@ function showView(name) {
   currentView = name;
   $$(".view").forEach((v) => v.classList.remove("active"));
   $(`#view-${name}`).classList.add("active");
-  $$(".nav-link").forEach((l) => l.classList.toggle("active", l.dataset.view === name));
+  $$(".nav-link, .sidebar-link").forEach((l) => l.classList.toggle("active", l.dataset.view === name));
   window.scrollTo(0, 0);
   // (re)load data for the view we're entering
   if (name === "landing") loadLanding();
@@ -547,9 +554,15 @@ async function getJSON(url) {
 
 function kpiTile(label, value, opts = {}) {
   const color = opts.color || "var(--ink)";
-  return `<div class="card p-4">
-    <div class="stat-value" style="color:${color}">${value}</div>
-    <div class="stat-label">${label}</div>
+  const icon = opts.icon ? `<i data-lucide="${opts.icon}" class="w-4 h-4 opacity-70"></i>` : "";
+  const extra = opts.extra || "";
+  return `<div class="card p-4 flex flex-col justify-between">
+    <div class="flex items-center justify-between text-xs font-mono opacity-70 mb-1">
+      <span class="tracking-wider uppercase font-semibold">${escapeHtml(label)}</span>
+      ${icon}
+    </div>
+    <div class="stat-value my-1" style="color:${color}">${value}</div>
+    ${extra}
   </div>`;
 }
 
@@ -574,10 +587,14 @@ async function loadDashboard() {
       const scoreEl = $("#dashRiskScore");
       const ratingEl = $("#dashRiskRating");
       const cardEl = $("#oshaRiskCard");
+      const ledEl = $("#dashRiskLed");
       if (scoreEl) scoreEl.textContent = score === null ? "—" : score;
       if (ratingEl) {
         ratingEl.textContent = hasRiskData ? riskResp.rating : "NO TICKET DATA YET";
-        ratingEl.className = !hasRiskData ? "hud-pill info" : score >= 85 ? "hud-pill ok" : score >= 65 ? "hud-pill warn" : "hud-pill danger";
+        ratingEl.className = !hasRiskData ? "hud-pill info font-mono text-xs" : score >= 85 ? "hud-pill ok font-mono text-xs" : score >= 65 ? "hud-pill warn font-mono text-xs" : "hud-pill danger font-mono text-xs";
+      }
+      if (ledEl) {
+        ledEl.className = !hasRiskData ? "status-led online" : score >= 85 ? "status-led online" : score >= 65 ? "status-led warn" : "status-led danger";
       }
       if (cardEl) {
         cardEl.className = !hasRiskData ? "card p-4 mb-5 border-l-4 border-l-slate-400" :
@@ -604,17 +621,60 @@ async function loadDashboard() {
       }
     }
     if (attendanceResp) renderAttendanceRows(attendanceResp.records || []);
-    else $("#attendanceTbody").innerHTML = `<tr><td colspan="4" class="text-center p-3 text-red-500">Check-in records unavailable.</td></tr>`;
+    else {
+      const receiptStream = $("#attendanceReceiptStream");
+      if (receiptStream) receiptStream.innerHTML = `<div class="text-center py-4 text-xs font-mono text-red-500">Check-in records unavailable.</div>`;
+      const tbody = $("#attendanceTbody");
+      if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-center p-3 text-red-500">Check-in records unavailable.</td></tr>`;
+    }
     renderEnvironment(currentEnvironmentData);
     if (preShiftResp) renderPreShift(preShiftResp);
     else $("#preShiftSummary").textContent = "Checklist unavailable";
 
+    const complianceVal = Math.round(stats.avg_compliance || 0);
+    const litSegments = Math.min(10, Math.max(0, Math.round(complianceVal / 10)));
+    const segMeter = `<div class="segmented-meter" title="${complianceVal}% compliance">${Array.from({length: 10}, (_, i) => `<span class="segment ${i < litSegments ? (complianceVal >= 80 ? 'lit-good' : 'lit-warn') : ''}"></span>`).join("")}</div>`;
+
+    const tallyStr = String(stats.workers || 0).padStart(3, "0");
+    const tallyHtml = `<div class="tally-display">${tallyStr.split("").map(d => `<span class="split-digit">${d}</span>`).join("")}</div>`;
+
+    // Populate Hardware Cockpit Module 1: Compliance
+    const cockpitCompVal = $("#cockpitComplianceVal");
+    if (cockpitCompVal) cockpitCompVal.textContent = pct(stats.avg_compliance);
+    const cockpitCompLabel = $("#cockpitComplianceLabel");
+    if (cockpitCompLabel) cockpitCompLabel.textContent = `${complianceVal}% verified rate`;
+    const cockpitMeter = $("#cockpitSegmentedMeter");
+    if (cockpitMeter) {
+      cockpitMeter.innerHTML = Array.from({length: 10}, (_, i) => 
+        `<span class="segment ${i < litSegments ? (complianceVal >= 80 ? 'lit-good' : 'lit-warn') : ''}"></span>`
+      ).join("");
+    }
+
+    // Populate Hardware Cockpit Module 2: Onsite Tally
+    const cockpitTally = $("#cockpitTallyDisplay");
+    if (cockpitTally) {
+      cockpitTally.innerHTML = tallyStr.split("").map(d => `<span class="split-digit">${d}</span>`).join("");
+    }
+
     $("#kpis").innerHTML =
-      kpiTile("Photos checked", stats.checks) +
-      kpiTile("Avg PPE in saved checks", pct(stats.avg_compliance),
-        { color: stats.avg_compliance >= 80 ? C.good : C.orange }) +
-      kpiTile("Violations", stats.violations, { color: stats.violations ? C.crit : C.good }) +
-      kpiTile("Workers seen", stats.workers);
+      kpiTile("Photos Checked", stats.checks, {
+        icon: "camera",
+        extra: `<span class="text-[11px] font-mono opacity-60">Verified frames & captures</span>`
+      }) +
+      kpiTile("PPE Compliance", pct(stats.avg_compliance), {
+        icon: "shield-check",
+        color: stats.avg_compliance >= 80 ? "var(--good)" : "var(--warning)",
+        extra: segMeter
+      }) +
+      kpiTile("Violations", stats.violations, {
+        icon: "alert-triangle",
+        color: stats.violations ? "var(--critical)" : "var(--good)",
+        extra: `<div class="flex items-center gap-1.5 mt-1 text-[11px] font-mono"><span class="status-led ${stats.violations ? 'danger' : 'online'}"></span><span class="opacity-75">${stats.violations ? 'Violations flagged' : 'Zero violations'}</span></div>`
+      }) +
+      kpiTile("Workers Seen", tallyHtml, {
+        icon: "users",
+        extra: `<span class="text-[11px] font-mono opacity-60">Cumulative headcount</span>`
+      });
 
     // Compliance-over-checks line (oldest -> newest so the x-axis reads left to right)
     const rows = [...insp].reverse();
@@ -660,30 +720,119 @@ async function loadDashboard() {
   }
 }
 
+function parsePPEFindings(findings, status) {
+  const text = (findings || "").toLowerCase();
+  const isFlagged = status === "REVIEW REQUIRED";
+  // Helmet / hardhat
+  let helmet = "ok";
+  if (/hardhat not conclusively|helmet not|no hardhat|no helmet|missing.*helmet|helmet.*missing|hardhat.*missing|missing.*hardhat/.test(text)) {
+    helmet = "missing";
+  } else if (/helmet.*unclear|hardhat.*unclear/.test(text)) {
+    helmet = "unknown";
+  }
+  // Vest / hi-vis
+  let vest = "ok";
+  if (/missing.*vest|vest.*missing|no.*vest|vest not|no hi.?vis|hi.?vis not/.test(text)) {
+    vest = "missing";
+  } else if (/vest.*unclear|hi.?vis.*unclear/.test(text)) {
+    vest = "unknown";
+  }
+  // If flagged but nothing specific found, mark both as needing review
+  if (isFlagged && helmet === "ok" && vest === "ok") {
+    helmet = "unknown";
+    vest = "unknown";
+  }
+  return { helmet, vest };
+}
+
 function renderAttendanceRows(records) {
   const tbody = $("#attendanceTbody");
-  if (!tbody) return;
-  $("#attendanceSummary").textContent = `${records.length} check-in${records.length === 1 ? "" : "s"} today`;
-  tbody.innerHTML = records.length
-    ? records.map((record) => `<tr>
-        <td>${escapeHtml(record.employee_id)}</td>
-        <td>${escapeHtml(record.checked_at)}</td>
-        <td><span class="pill ${record.ppe_status === "REVIEW REQUIRED" ? "pill-bad" : "pill-good"}">${escapeHtml(record.ppe_status)}</span></td>
-        <td>${escapeHtml(record.findings)}</td>
-        <td>${record.ticket_id
-          ? `<button type="button" class="attendance-ticket-link" data-ticket-link>${escapeHtml(record.ticket_id)}${record.confirmed_by ? ` · ${escapeHtml(record.confirmed_by)}` : ""}</button>`
-          : (record.ppe_status === "REVIEW REQUIRED"
-            ? `<button type="button" class="btn-ghost attendance-confirm-button" data-employee-id="${escapeHtml(record.employee_id)}" data-check-date="${escapeHtml(record.check_date)}">Verify in person</button>`
-            : `<span style="color:var(--muted)">No action</span>`)}</td>
-      </tr>`).join("")
-    : `<tr><td colspan="5" class="text-center p-3" style="color:var(--ink-2)">No check-ins recorded today.</td></tr>`;
+  const count = records.length;
+  const summaryEl = $("#attendanceSummary");
+  if (summaryEl) summaryEl.textContent = `${count} check-in${count === 1 ? "" : "s"} today`;
 
-  tbody.querySelectorAll(".attendance-confirm-button").forEach((button) => {
+  // Legacy hidden table (keep for any downstream references)
+  if (tbody) {
+    tbody.innerHTML = count
+      ? records.map((record) => `<tr>
+          <td>${escapeHtml(record.employee_id)}</td>
+          <td>${escapeHtml(record.checked_at)}</td>
+          <td><span class="pill ${record.ppe_status === "REVIEW REQUIRED" ? "pill-bad" : "pill-good"}">${escapeHtml(record.ppe_status)}</span></td>
+          <td>${escapeHtml(record.findings)}</td>
+          <td>${record.ticket_id
+            ? `<button type="button" class="attendance-ticket-link" data-ticket-link>${escapeHtml(record.ticket_id)}${record.confirmed_by ? ` · ${escapeHtml(record.confirmed_by)}` : ""}</button>`
+            : (record.ppe_status === "REVIEW REQUIRED"
+              ? `<button type="button" class="btn-ghost attendance-confirm-button" data-employee-id="${escapeHtml(record.employee_id)}" data-check-date="${escapeHtml(record.check_date)}">Verify in person</button>`
+              : `<span style="color:var(--muted)">No action</span>`)}</td>
+        </tr>`).join("")
+      : `<tr><td colspan="5" class="text-center p-3" style="color:var(--ink-2)">No check-ins recorded today.</td></tr>`;
+  }
+
+  // New personnel check-in table
+  const newTbody = $("#personnelCheckInTbody");
+  if (newTbody) {
+    if (!count) {
+      newTbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-xs font-mono" style="color:var(--muted)">No check-ins recorded today.</td></tr>`;
+    } else {
+      newTbody.innerHTML = records.map((record, idx) => {
+        const isFlagged = record.ppe_status === "REVIEW REQUIRED";
+        const empId = escapeHtml(record.employee_id || `EMP-${String(idx + 1).padStart(3, "0")}`);
+        const initials = (record.employee_id || "?").replace(/[^A-Z0-9]/gi, "").slice(-3).toUpperCase() || "?";
+        const zone = record.zone ? `ZONE ${escapeHtml(String(record.zone))}` : (idx < 6 ? `ZONE ${idx + 1}` : "—");
+        const timeStr = record.checked_at
+          ? (() => {
+              try {
+                const d = new Date(record.checked_at);
+                return isNaN(d) ? escapeHtml(record.checked_at)
+                  : `Today at ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+              } catch { return escapeHtml(record.checked_at); }
+            })()
+          : "—";
+
+        const { helmet, vest } = parsePPEFindings(record.findings, record.ppe_status);
+        const helmetPill = helmet === "missing"
+          ? `<span class="ppe-pill missing">⚠ Helmet Missing</span>`
+          : helmet === "unknown"
+            ? `<span class="ppe-pill warn">? Helmet Unclear</span>`
+            : `<span class="ppe-pill ok">✓ Helmet OK</span>`;
+        const vestPill = vest === "missing"
+          ? `<span class="ppe-pill missing">⚠ Vest Missing</span>`
+          : vest === "unknown"
+            ? `<span class="ppe-pill warn">⚠ Vest Missing</span>`
+            : `<span class="ppe-pill ok">✓ Vest OK</span>`;
+
+        let actionCell = "";
+        if (record.ticket_id) {
+          actionCell = `<button type="button" class="personnel-action-btn link attendance-ticket-link" data-ticket-link>Ticket #${escapeHtml(record.ticket_id)}</button>`;
+        } else if (isFlagged && !record.ticket_id) {
+          actionCell = `<button type="button" class="personnel-action-btn warn attendance-confirm-button" data-employee-id="${escapeHtml(record.employee_id)}" data-check-date="${escapeHtml(record.check_date)}">Verify</button>`;
+        }
+
+        return `<tr>
+          <td>
+            <div class="worker-cell">
+              <span class="worker-avatar">${initials}</span>
+              <span class="worker-name">${empId}</span>
+            </div>
+          </td>
+          <td><span class="emp-badge">${empId}</span></td>
+          <td><span class="zone-label">${zone}</span></td>
+          <td><span class="checkin-time">${timeStr}</span></td>
+          <td>
+            <div class="ppe-pills">${helmetPill}${vestPill}${actionCell ? `<span style="margin-left:4px">${actionCell}</span>` : ""}</div>
+          </td>
+        </tr>`;
+      }).join("");
+    }
+  }
+
+  document.querySelectorAll(".attendance-confirm-button").forEach((button) => {
     button.addEventListener("click", () => openAttendanceConfirmation(button));
   });
-  tbody.querySelectorAll("[data-ticket-link]").forEach((button) => {
+  document.querySelectorAll("[data-ticket-link]").forEach((button) => {
     button.addEventListener("click", () => showView("tickets"));
   });
+  if (window.lucide) lucide.createIcons();
 }
 
 function renderEnvironment(data) {
@@ -1075,7 +1224,30 @@ function renderPreShift(data) {
   $("#preShiftSummary").textContent = checklist
     ? `${data.completed_items}/${data.total_items} checks${complete ? " complete" : " done"}`
     : "Not recorded";
+
+  // Sync Cockpit Module 3 switches & status badge
+  const cockpitHc = $("#cockpitHeadcount");
+  if (cockpitHc) cockpitHc.checked = checklist ? Boolean(checklist.headcount_ready) : false;
+  const cockpitTb = $("#cockpitToolbox");
+  if (cockpitTb) cockpitTb.checked = checklist ? Boolean(checklist.toolbox_talk) : false;
+  const cockpitPpe = $("#cockpitPpe");
+  if (cockpitPpe) cockpitPpe.checked = checklist ? Boolean(checklist.ppe_inspected) : false;
+  const cockpitBadge = $("#cockpitPreShiftBadge");
+  if (cockpitBadge) {
+    cockpitBadge.textContent = checklist ? `${data.completed_items}/${data.total_items} READY` : "STANDBY";
+    cockpitBadge.className = complete ? "hud-pill ok text-[10px] font-mono" : "hud-pill info text-[10px] font-mono";
+  }
 }
+
+window.syncPreShiftToggle = function(el, inputName) {
+  const formInput = document.querySelector(`#preShiftForm [name="${inputName}"]`);
+  if (formInput) formInput.checked = el.checked;
+};
+
+window.submitCockpitPreShift = function() {
+  const form = document.getElementById("preShiftForm");
+  if (form) form.requestSubmit();
+};
 
 async function loadAttendance() {
   if (currentUser?.role === "worker") {
