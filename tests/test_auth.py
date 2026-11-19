@@ -151,6 +151,10 @@ class AuthenticationTests(unittest.TestCase):
             json={"username": "site-supervisor", "password": "supervisor-test-password"},
         )
         self.assertEqual(supervisor_client.get("/api/auth/users").status_code, 403)
+        database.record_attendance("EMP005", "CLEAR", "PPE check passed.")
+        attendance = supervisor_client.get("/api/attendance")
+        self.assertEqual(attendance.status_code, 200)
+        self.assertEqual(attendance.json()["records"][0]["employee_id"], "EMP005")
 
         self.assertEqual(self.client.get("/api/auth/users").status_code, 200)
 

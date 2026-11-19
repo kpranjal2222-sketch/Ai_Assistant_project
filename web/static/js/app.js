@@ -112,12 +112,110 @@ function enableAuthenticatedApp(user) {
   $("#signedInUser").classList.remove("hidden");
   $("#signOutButton").classList.remove("hidden");
   $("#manageUsersButton").classList.toggle("hidden", user.role !== "admin");
+  $("#attendanceRecordsPanel").classList.toggle(
+    "hidden",
+    user.role !== "admin" && user.role !== "supervisor",
+  );
   const employeeIdField = $("#attendanceEmployeeId");
   employeeIdField.readOnly = user.role === "worker";
   if (user.role === "worker") employeeIdField.value = user.username;
   applyRoleNavigation();
   showView(user.role === "worker" ? "worker-dashboard" : "landing");
 }
+
+function initializeAuthSelects() {
+  $$(".auth-select[data-auth-select]").forEach((wrapper) => {
+    const select = wrapper.querySelector("select");
+    const trigger = wrapper.querySelector('[role="combobox"]');
+    const menu = wrapper.querySelector('[role="listbox"]');
+    const value = wrapper.querySelector("[data-auth-select-value]");
+
+    const syncSelection = () => {
+      value.textContent = select.selectedOptions[0]?.textContent.trim() || "";
+      menu.querySelectorAll('[role="option"]').forEach((option) => {
+        option.setAttribute("aria-selected", String(option.dataset.value === select.value));
+      });
+    };
+
+    const closeMenu = (restoreFocus = false) => {
+      menu.hidden = true;
+      trigger.setAttribute("aria-expanded", "false");
+      if (restoreFocus) trigger.focus();
+    };
+
+    const chooseOption = (option) => {
+      select.value = option.dataset.value;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      closeMenu(true);
+    };
+
+    const renderOptions = () => {
+      menu.replaceChildren();
+      Array.from(select.options).forEach((nativeOption) => {
+        const option = document.createElement("div");
+        option.className = "auth-select-option";
+        option.setAttribute("role", "option");
+        option.setAttribute("aria-selected", String(nativeOption.value === select.value));
+        option.dataset.value = nativeOption.value;
+        option.tabIndex = -1;
+        option.textContent = nativeOption.textContent.trim();
+        option.addEventListener("click", () => chooseOption(option));
+        option.addEventListener("keydown", (event) => {
+          const options = Array.from(menu.querySelectorAll('[role="option"]'));
+          const index = options.indexOf(option);
+          let nextIndex = index;
+          if (event.key === "ArrowDown") nextIndex = (index + 1) % options.length;
+          else if (event.key === "ArrowUp") nextIndex = (index - 1 + options.length) % options.length;
+          else if (event.key === "Home") nextIndex = 0;
+          else if (event.key === "End") nextIndex = options.length - 1;
+          else if (event.key === "Escape") {
+            event.preventDefault();
+            closeMenu(true);
+            return;
+          } else if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            chooseOption(option);
+            return;
+          } else if (event.key === "Tab") {
+            closeMenu();
+            return;
+          } else {
+            return;
+          }
+          event.preventDefault();
+          options[nextIndex].focus();
+        });
+        menu.append(option);
+      });
+      syncSelection();
+    };
+
+    const openMenu = () => {
+      menu.hidden = false;
+      trigger.setAttribute("aria-expanded", "true");
+      const selectedOption = menu.querySelector('[aria-selected="true"]');
+      (selectedOption || menu.querySelector('[role="option"]'))?.focus();
+    };
+
+    trigger.addEventListener("click", () => {
+      if (menu.hidden) openMenu();
+      else closeMenu(true);
+    });
+    trigger.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openMenu();
+      }
+    });
+    select.addEventListener("change", syncSelection);
+    document.addEventListener("pointerdown", (event) => {
+      if (!wrapper.contains(event.target)) closeMenu();
+    });
+    renderOptions();
+  });
+}
+
+initializeAuthSelects();
 
 function updateLoginRoleFields() {
   const isWorker = $("#authLoginRole").value === "worker";
@@ -222,7 +320,7 @@ $("#authRegisterLink").addEventListener("click", () => {
   const selectedRole = $("#authLoginRole").value;
   $("#authRegisterRole").value = selectedRole === "worker" ? "worker"
     : selectedRole === "admin" || selectedRole === "supervisor" ? selectedRole : "visitor";
-  updateRegistrationFields();
+  $("#authRegisterRole").dispatchEvent(new Event("change", { bubbles: true }));
   $("#authRegisterForm").classList.remove("hidden");
   $("#authMessage").textContent = "";
 });
@@ -826,6 +924,31 @@ function renderAttendanceRows(records) {
     }
   }
 
+  const pageTbody = $("#attendancePageTbody");
+  const pageSummary = $("#attendancePageSummary");
+  if (pageSummary) {
+    pageSummary.textContent = `${count} check-in${count === 1 ? "" : "s"} today`;
+  }
+  if (pageTbody) {
+    pageTbody.innerHTML = count
+      ? records.map((record) => {
+        const isFlagged = record.ppe_status === "REVIEW REQUIRED";
+        const action = record.ticket_id
+          ? `<button type="button" class="personnel-action-btn link attendance-ticket-link" data-ticket-link>Ticket #${escapeHtml(record.ticket_id)}</button>`
+          : isFlagged
+            ? `<button type="button" class="personnel-action-btn warn attendance-confirm-button" data-employee-id="${escapeHtml(record.employee_id)}" data-check-date="${escapeHtml(record.check_date)}">Verify</button>`
+            : `<span style="color:var(--muted)">No action</span>`;
+        return `<tr>
+          <td><span class="emp-badge">${escapeHtml(record.employee_id)}</span></td>
+          <td>${escapeHtml(record.checked_at)}</td>
+          <td><span class="pill ${isFlagged ? "pill-bad" : "pill-good"}">${escapeHtml(record.ppe_status)}</span></td>
+          <td>${escapeHtml(record.findings)}</td>
+          <td>${action}</td>
+        </tr>`;
+      }).join("")
+      : `<tr><td colspan="5" class="text-center py-6 text-xs" style="color:var(--muted)">No worker check-ins recorded today.</td></tr>`;
+  }
+
   document.querySelectorAll(".attendance-confirm-button").forEach((button) => {
     button.addEventListener("click", () => openAttendanceConfirmation(button));
   });
@@ -1258,9 +1381,13 @@ async function loadAttendance() {
     const data = await getJSON("/api/attendance");
     renderAttendanceRows(data.records || []);
   } catch (error) {
-    $("#attendanceTbody").innerHTML = `<tr><td colspan="5" class="text-center p-3 text-red-500">Could not load records: ${escapeHtml(error.message)}</td></tr>`;
+    const errorRow = `<tr><td colspan="5" class="text-center p-3 text-red-500">Could not load records: ${escapeHtml(error.message)}</td></tr>`;
+    $("#attendanceTbody").innerHTML = errorRow;
+    if ($("#attendancePageTbody")) $("#attendancePageTbody").innerHTML = errorRow;
   }
 }
+
+$("#refreshAttendanceRecords").addEventListener("click", loadAttendance);
 
 async function loadWorkerDashboard() {
   const summary = $("#workerAttendanceSummary");
@@ -2915,12 +3042,6 @@ function selectMapZone(zoneCode) {
   selectedMapZone = zoneCode;
   const zone = blueprintZonesData.find((item) => item.zone_code === zoneCode);
   if (!zone) return;
-  const zoneLayer = $('[data-map-layer="zones"]');
-  if (zoneLayer && !zoneLayer.checked) {
-    zoneLayer.checked = true;
-    updateSitePlanLayers();
-  }
-
   $$("#sitePlan .site-zone").forEach((node) => {
     const selected = node.dataset.zoneCode === zoneCode;
     node.classList.toggle("selected", selected);
@@ -2954,11 +3075,6 @@ function initSitePlan() {
   const plan = $("#sitePlan");
   if (!plan) return;
 
-  $$("[data-map-layer]").forEach((input) => {
-    input.addEventListener("change", updateSitePlanLayers);
-  });
-  updateSitePlanLayers();
-
   plan.querySelectorAll(".site-zone").forEach((node) => {
     const activate = () => selectMapZone(node.dataset.zoneCode);
     node.addEventListener("click", activate);
@@ -2982,15 +3098,6 @@ function initSitePlan() {
   $$(".site-source-button").forEach((button) => {
     button.addEventListener("click", () => openMapSource(button.dataset.cameraId));
   });
-}
-
-function updateSitePlanLayers() {
-  const plan = $("#sitePlan");
-  if (!plan) return;
-  plan.classList.toggle("hide-zones", !$('[data-map-layer="zones"]').checked);
-  plan.classList.toggle("hide-facilities", !$('[data-map-layer="facilities"]').checked);
-  plan.classList.toggle("hide-routes", !$('[data-map-layer="routes"]').checked);
-  plan.classList.toggle("hide-sources", !$('[data-map-layer="sources"]').checked);
 }
 
 // ====================================================================

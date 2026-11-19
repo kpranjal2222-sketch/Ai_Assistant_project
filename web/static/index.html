@@ -24,10 +24,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Sans+3:wght@350..700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="/css/tailwind.generated.css?v=ui-draft-1" />
-  <link rel="stylesheet" href="/css/styles.css?v=ui-draft-1" />
+  <link rel="stylesheet" href="/css/styles.css?v=login-background-restore-1" />
   <script defer src="/vendor/chart.umd.js?v=ui-draft-1"></script>
   <script defer src="/vendor/lucide.min.js?v=ui-draft-1"></script>
 </head>
@@ -35,14 +35,74 @@
 <body class="min-h-screen">
 
   <section id="authGate" class="auth-gate" aria-labelledby="authGateTitle">
+    <div class="auth-brand" aria-label="SiteSentinel field unit 04">
+      <span class="logo-badge"><i data-lucide="hard-hat" aria-hidden="true"></i></span>
+      <span class="auth-brand-name">SITESENTINEL <small>FIELD UNIT 04</small></span>
+    </div>
+    <div class="auth-context">
+      <p class="auth-context-label">SiteSentinel · Local operations</p>
+      <h2>Construction safety, in one working view.</h2>
+      <p class="auth-context-copy">Review site activity, coordinate everyday checks, and follow up on incidents from this local project.</p>
+      <ul class="auth-context-list" aria-label="Project tools">
+        <li><i data-lucide="camera" aria-hidden="true"></i><span>Photo and video reviews</span></li>
+        <li><i data-lucide="user-check" aria-hidden="true"></i><span>Worker check-in</span></li>
+        <li><i data-lucide="clipboard-check" aria-hidden="true"></i><span>Incident follow-up</span></li>
+      </ul>
+      <figure class="auth-blueprint">
+      <svg viewBox="0 0 640 240" role="img" aria-label="Illustration of a construction site with a crane, building frame, and marked route; not to scale" focusable="false">
+        <defs>
+          <pattern id="siteGrid" width="28" height="28" patternUnits="userSpaceOnUse">
+            <path d="M28 0H0V28" fill="none" stroke="#697581" stroke-opacity=".16" stroke-width="1" />
+          </pattern>
+          <linearGradient id="siteGround" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#29313a" />
+            <stop offset="1" stop-color="#1b2026" />
+          </linearGradient>
+        </defs>
+        <rect width="640" height="240" fill="#171b20" />
+        <rect width="640" height="240" fill="url(#siteGrid)" />
+        <text x="28" y="30" fill="#d3d9df" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" letter-spacing="1.5">SITE OVERVIEW</text>
+        <circle cx="523" cy="26" r="4" fill="#f27a3d" />
+        <text x="535" y="30" fill="#9ba6b1" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing=".8">CONCEPT PLAN</text>
+
+        <path d="M34 157 291 54 606 145 349 215Z" fill="url(#siteGround)" stroke="#4a5561" stroke-width="1.5" />
+        <path d="m67 156 224-89 278 80-225 61Z" fill="none" stroke="#5b6672" stroke-opacity=".55" stroke-dasharray="5 5" />
+        <path d="m91 165 235-92" fill="none" stroke="#f27a3d" stroke-width="2" stroke-dasharray="5 6" />
+        <circle cx="111" cy="157" r="5" fill="#f27a3d" stroke="#171b20" stroke-width="2" />
+        <circle cx="207" cy="119" r="5" fill="#f27a3d" stroke="#171b20" stroke-width="2" />
+
+        <path d="M249 105 359 65 452 94 342 135Z" fill="#343e48" stroke="#788592" stroke-width="1.5" />
+        <path d="m249 105 93 30v65l-93-31Z" fill="#252c33" stroke="#65717e" stroke-width="1.5" />
+        <path d="m342 135 110-41v65l-110 41Z" fill="#20262c" stroke="#65717e" stroke-width="1.5" />
+        <path d="m249 126 93 30 110-41M249 148l93 30 110-41" fill="none" stroke="#65717e" stroke-width="1.2" />
+        <path d="m278 114 0 62m31-52v63m63-55v63m37-76v64" fill="none" stroke="#788592" stroke-opacity=".8" stroke-width="1.2" />
+        <path d="m249 105 0 65m31-77v87m31-98v98m31-45v65m37-114v100m37-113v99m36-79v65" fill="none" stroke="#f27a3d" stroke-opacity=".62" stroke-width="1" />
+
+        <path d="M185 55v86m-8 0h16m-8-86 8 9h-16Z" fill="none" stroke="#f27a3d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" />
+        <path d="M104 55h190m-109 0v12m-64-12v8m154-8v8m-71 0 8 8-8 8" fill="none" stroke="#f27a3d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" />
+        <path d="M285 55h9l-8 5" fill="none" stroke="#9ba6b1" stroke-width="2" />
+        <rect x="96" y="52" width="14" height="6" rx="2" fill="#f27a3d" />
+
+        <path d="m92 187 237-94 226 66" fill="none" stroke="#f27a3d" stroke-width="2" stroke-dasharray="6 6" />
+        <circle cx="92" cy="187" r="5" fill="#f27a3d" />
+        <circle cx="329" cy="93" r="5" fill="#f27a3d" />
+        <circle cx="555" cy="159" r="5" fill="#f27a3d" />
+        <text x="42" y="220" fill="#9ba6b1" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing=".5">ACCESS</text>
+        <text x="286" y="220" fill="#9ba6b1" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing=".5">WORK ZONE</text>
+        <text x="518" y="220" fill="#9ba6b1" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing=".5">STAGING</text>
+      </svg>
+      <figcaption>Example site zones · illustrative only, not to scale</figcaption>
+      </figure>
+      <p class="auth-context-note">Your account role determines which project records and tools you can use.</p>
+    </div>
     <article class="auth-card draft-frame">
       <!-- Access strip -->
       <div class="terminal-led-strip">
         <div class="flex items-center gap-2">
           <span class="status-led online"></span>
-          <span class="terminal-stencil text-[10px]">SITESENTINEL · SECURE ACCESS</span>
+        <span class="terminal-stencil text-[10px]">SiteSentinel · Secure access</span>
         </div>
-        <span class="text-[9px] font-mono opacity-60">LOCAL SESSION</span>
+      <span class="text-[9px] font-mono opacity-60">Local session</span>
       </div>
 
       <div class="flex items-center gap-3 mt-1 mb-2">
@@ -53,13 +113,20 @@
         </div>
       </div>
       <form id="authLoginForm" class="auth-form hidden">
-        <label for="authLoginRole">Sign in as</label>
-        <select id="authLoginRole" name="role" required>
-          <option value="admin">Administrator</option>
-          <option value="supervisor">Supervisor</option>
-          <option value="worker">Worker</option>
-          <option value="viewer">Visitor (read-only)</option>
-        </select>
+        <label id="authLoginRoleLabel" for="authLoginRoleButton">Sign in as</label>
+        <div class="auth-select" data-auth-select>
+          <select id="authLoginRole" class="auth-select-native" name="role" required hidden>
+            <option value="admin">Administrator</option>
+            <option value="supervisor">Supervisor</option>
+            <option value="worker">Worker</option>
+            <option value="viewer">Visitor (read-only)</option>
+          </select>
+          <button id="authLoginRoleButton" class="auth-select-trigger" type="button" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="authLoginRoleMenu" aria-labelledby="authLoginRoleLabel authLoginRoleValue">
+            <span id="authLoginRoleValue" data-auth-select-value></span>
+            <i data-lucide="chevron-down" aria-hidden="true"></i>
+          </button>
+          <div id="authLoginRoleMenu" class="auth-select-menu" role="listbox" aria-labelledby="authLoginRoleLabel" hidden></div>
+        </div>
         <label id="authLoginIdentifierLabel" for="authLoginUsername">Username</label>
         <input id="authLoginUsername" name="username" autocomplete="username" required maxlength="32" />
         <label for="authLoginPassword">Password</label>
@@ -70,13 +137,20 @@
         <button id="authRegisterLink" class="btn-ghost justify-center font-mono text-xs" type="button">Need an account? Register</button>
       </form>
       <form id="authRegisterForm" class="auth-form hidden">
-        <label for="authRegisterRole">Account type</label>
-        <select id="authRegisterRole" name="account_type" required>
-          <option value="visitor">Visitor (read-only)</option>
-          <option value="worker">Worker</option>
-          <option value="supervisor">Supervisor (admin approval)</option>
-          <option value="admin">Administrator (admin approval)</option>
-        </select>
+        <label id="authRegisterRoleLabel" for="authRegisterRoleButton">Account type</label>
+        <div class="auth-select" data-auth-select>
+          <select id="authRegisterRole" class="auth-select-native" name="account_type" required hidden>
+            <option value="visitor">Visitor (read-only)</option>
+            <option value="worker">Worker</option>
+            <option value="supervisor">Supervisor (admin approval)</option>
+            <option value="admin">Administrator (admin approval)</option>
+          </select>
+          <button id="authRegisterRoleButton" class="auth-select-trigger" type="button" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="authRegisterRoleMenu" aria-labelledby="authRegisterRoleLabel authRegisterRoleValue">
+            <span id="authRegisterRoleValue" data-auth-select-value></span>
+            <i data-lucide="chevron-down" aria-hidden="true"></i>
+          </button>
+          <div id="authRegisterRoleMenu" class="auth-select-menu" role="listbox" aria-labelledby="authRegisterRoleLabel" hidden></div>
+        </div>
         <p id="authRegisterGuidance" class="auth-setup-note" aria-live="polite"></p>
         <label id="authRegisterNameLabel" for="authRegisterName">Name</label>
         <input id="authRegisterName" name="display_name" autocomplete="name" required maxlength="80" />
@@ -345,7 +419,7 @@
             <span>Illustrative site map</span>
             <span class="feature-tag">5 ZONES</span>
           </h3>
-          <p class="text-xs" style="color:var(--ink-2)">Explore a schematic site arrangement, configured zones, and local demo sources. No worker locations or live camera feeds are shown.</p>
+          <p class="text-xs" style="color:var(--ink-2)">Explore the illustrative aerial site image, configured zones, and local demo sources. No worker locations or live camera feeds are shown.</p>
         </div>
         <div class="feature-card" data-view="air-quality" role="button" tabindex="0">
           <div class="feature-ic"><i data-lucide="wind"></i></div>
@@ -481,9 +555,9 @@
     <section id="view-map" class="view">
       <div class="site-map-heading">
         <div>
-          <span class="site-map-kicker">SITE REFERENCE / TRAINING DIAGRAM</span>
-          <h1 class="text-2xl font-bold mt-1 mb-1">Illustrative site plan</h1>
-          <p class="text-sm" style="color:var(--ink-2)">A visual guide to example work areas, site facilities, and access routes.</p>
+          <span class="site-map-kicker">SITE REFERENCE / INDUSTRIAL ZONE IMAGE</span>
+          <h1 class="text-2xl font-bold mt-1 mb-1">Industrial construction site map</h1>
+          <p class="text-sm" style="color:var(--ink-2)">An illustrative aerial view with configured hazard areas and local review inputs.</p>
         </div>
         <span class="hud-pill warn font-mono flex items-center gap-1.5"><i data-lucide="triangle-alert" class="w-3.5 h-3.5"></i>EXAMPLE ONLY · NOT A REAL SITE MAP</span>
       </div>
@@ -492,31 +566,24 @@
         <div class="site-map-explainer-icon"><i data-lucide="map" aria-hidden="true"></i></div>
         <div>
           <strong>How to use this page</strong>
-          <p>Select a zone from the list or directly on the drawing to see its configured hazard and risk label. Use the layer switches to simplify the drawing. Choose a demo source to open its review screen; video review starts only when you press Start.</p>
+          <p>Select a zone from the list or directly on the image to see its configured hazard and risk label. Zone outlines mark approximate areas. Choose a demo source below to open its review screen; video review starts only when you press Start.</p>
         </div>
-        <span>Positions are schematic. Zone labels are setup examples, not live readings.</span>
+        <span>Zone positions are approximate. Configured labels are not live readings.</span>
       </div>
 
       <div class="site-map-layout">
         <div class="card site-plan-card">
           <div class="site-plan-toolbar">
             <div>
-              <span class="site-map-kicker">TOP-DOWN VIEW / NOT TO SCALE</span>
+              <span class="site-map-kicker">INDUSTRIAL SITE MAP / NOT TO SCALE</span>
               <div class="site-plan-title">Work areas &amp; site facilities</div>
             </div>
-            <span class="site-plan-note">SCHEMATIC <span aria-hidden="true">·</span> NO GPS OR LIVE CAMERAS</span>
-          </div>
-          <div class="site-map-controls" aria-label="Site plan layers">
-            <span class="site-map-control-label">SHOW / HIDE</span>
-            <label><input type="checkbox" data-map-layer="zones" checked> Hazard zones</label>
-            <label><input type="checkbox" data-map-layer="facilities" checked> Site facilities</label>
-            <label><input type="checkbox" data-map-layer="routes" checked> Roads &amp; gate</label>
-            <label><input type="checkbox" data-map-layer="sources" checked> Demo sources</label>
+            <span class="site-plan-note">ILLUSTRATIVE <span aria-hidden="true">·</span> NO LIVE SITE DATA</span>
           </div>
           <div class="site-plan-viewport">
-            <svg id="sitePlan" class="site-plan" viewBox="0 0 1200 780" role="img" aria-labelledby="sitePlanTitle sitePlanDescription">
-              <title id="sitePlanTitle">Illustrative construction site plan, not to scale</title>
-              <desc id="sitePlanDescription">A clean schematic training diagram with five selectable hazard areas, clearly marked site facilities, access road, gate, and assembly point. It is not a surveyed site map and shows no live conditions or camera locations.</desc>
+            <svg id="sitePlan" class="site-plan" viewBox="0 0 1365 768" role="img" aria-labelledby="sitePlanTitle sitePlanDescription">
+              <title id="sitePlanTitle">Industrial construction site zone map</title>
+              <desc id="sitePlanDescription">Illustrative aerial construction site image with five selectable approximate hazard areas. It is not a surveyed map and does not show live site conditions.</desc>
               <defs>
                 <pattern id="siteGrid" width="48" height="48" patternUnits="userSpaceOnUse">
                   <path d="M48 0H0V48" class="site-grid-line" fill="none"/>
@@ -528,6 +595,8 @@
                   <path d="M0 0L10 5L0 10Z" class="site-route-arrow"/>
                 </marker>
               </defs>
+
+              <image class="site-plan-image" href="/images/construction-site.png" x="0" y="0" width="1365" height="768" preserveAspectRatio="none"/>
 
               <rect width="1200" height="780" class="site-ground"/>
               <rect width="1200" height="780" fill="url(#siteGrid)" opacity=".45"/>
@@ -581,14 +650,14 @@
               </g>
 
               <g class="site-zone" data-zone-code="ZONE-D" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone D, elevated framing deck">
-                <rect x="82" y="220" width="286" height="158" rx="5" class="site-zone-shape"/>
+                <rect x="128" y="190" width="344" height="165" rx="5" class="site-zone-shape"/>
                 <text x="104" y="253" class="site-zone-code">ZONE D</text>
                 <text x="104" y="292" class="site-zone-label">Elevated framing</text>
                 <text x="104" y="321" class="site-zone-sub">FALL-FROM-HEIGHT AREA</text>
                 <path d="M104 344H344" class="site-zone-contour"/>
               </g>
               <g class="site-zone" data-zone-code="ZONE-B" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone B, high-voltage transformer bay">
-                <rect x="832" y="220" width="244" height="158" rx="5" class="site-zone-shape"/>
+                <rect x="905" y="190" width="350" height="170" rx="5" class="site-zone-shape"/>
                 <text x="854" y="253" class="site-zone-code">ZONE B</text>
                 <text x="854" y="292" class="site-zone-label">Transformer bay</text>
                 <text x="854" y="321" class="site-zone-sub">HIGH-VOLTAGE / RESTRICTED</text>
@@ -596,14 +665,14 @@
               </g>
 
               <g class="site-zone" data-zone-code="ZONE-A" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone A, excavation and trench area">
-                <rect x="82" y="414" width="286" height="158" rx="5" class="site-zone-shape"/>
+                <rect x="130" y="430" width="350" height="165" rx="5" class="site-zone-shape"/>
                 <text x="104" y="447" class="site-zone-code">ZONE A</text>
                 <text x="104" y="486" class="site-zone-label">Excavation &amp; trench</text>
                 <text x="104" y="515" class="site-zone-sub">GROUNDWORKS AREA</text>
                 <path d="M104 538H344" class="site-zone-contour"/>
               </g>
               <g class="site-zone" data-zone-code="ZONE-E" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone E, hot-work and fuel storage bay">
-                <rect x="832" y="414" width="244" height="158" rx="5" class="site-zone-shape"/>
+                <rect x="895" y="423" width="360" height="170" rx="5" class="site-zone-shape"/>
                 <text x="854" y="447" class="site-zone-code">ZONE E</text>
                 <text x="854" y="486" class="site-zone-label">Hot-work &amp; fuel</text>
                 <text x="854" y="515" class="site-zone-sub">FIRE / STORAGE AREA</text>
@@ -611,7 +680,7 @@
               </g>
 
               <g class="site-zone" data-zone-code="ZONE-C" data-risk-level="unknown" tabindex="0" role="button" aria-label="Select Zone C, tower crane swing radius">
-                <circle cx="610" cy="420" r="142" class="site-zone-shape"/>
+                <circle cx="690" cy="411" r="183" class="site-zone-shape"/>
                 <circle cx="610" cy="420" r="112" class="site-zone-detail"/>
                 <path d="M610 420V300M610 420L708 364M610 420L510 476" class="site-crane-line"/>
                 <circle cx="610" cy="420" r="13" class="site-crane-hub"/>
@@ -656,7 +725,7 @@
               </g>
             </svg>
           </div>
-          <p class="site-map-mobile-hint">Swipe sideways to inspect the full schematic.</p>
+          <p class="site-map-mobile-hint">Swipe sideways to inspect the full site map.</p>
           <div class="site-plan-footer">
             <div class="site-risk-legend" aria-label="Configured zone risk colors">
               <span><i class="site-risk-dot" data-risk-level="low"></i>Low</span>
@@ -665,8 +734,6 @@
               <span><i class="site-risk-dot" data-risk-level="critical"></i>Critical</span>
               <span><i class="site-risk-dot" data-risk-level="catastrophic"></i>Catastrophic</span>
             </div>
-            <span><i class="site-legend-dot facility-dot"></i> Example facility</span>
-            <span><i class="site-legend-dot source-dot"></i> Local demo input</span>
           </div>
         </div>
 
@@ -1342,7 +1409,7 @@
       <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
         <div>
           <p class="text-[10px] font-mono tracking-widest uppercase" style="color:var(--orange)">Worker entry / PPE screening</p>
-          <h1 class="text-xl font-bold mb-1">Worker check-in</h1>
+          <h1 class="text-xl font-bold mb-1">Worker attendance &amp; check-in</h1>
           <p class="text-sm" style="color:var(--ink-2)">Enter an employee ID, capture or upload a photo, then review the model's PPE flags with a supervisor.</p>
         </div>
         <span class="hud-pill warn">AI result is not identity verification</span>
@@ -1385,6 +1452,35 @@
           <img id="attendanceAnnotated" class="hidden w-full rounded-lg mt-3" alt="Temporary annotated PPE screening result">
         </article>
       </div>
+
+      <article id="attendanceRecordsPanel" class="card mt-5 p-4 hidden">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <div>
+            <h2 class="font-semibold">Today's worker attendance</h2>
+            <p class="text-xs mt-1" style="color:var(--ink-2)">Check-ins submitted by workers today. Photos are not retained.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="attendancePageSummary" class="text-xs font-mono" style="color:var(--ink-2)">Loading...</span>
+            <button id="refreshAttendanceRecords" class="btn-ghost text-xs" type="button">Refresh</button>
+          </div>
+        </div>
+        <div class="personnel-table-wrap">
+          <table class="personnel-table">
+            <thead>
+              <tr>
+                <th>WORKER</th>
+                <th>CHECK-IN</th>
+                <th>PPE STATUS</th>
+                <th>FINDINGS</th>
+                <th>FOLLOW-UP</th>
+              </tr>
+            </thead>
+            <tbody id="attendancePageTbody">
+              <tr><td colspan="5" class="text-center py-6 text-xs" style="color:var(--muted)">Loading check-ins…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
     </section>
 
     <!-- ===================== SAFETY DETECTION ===================== -->
@@ -1586,6 +1682,6 @@
 
   </main>
 
-  <script defer src="/js/app.js?v=ui-draft-1"></script>
+  <script defer src="/js/app.js?v=auth-select-v1"></script>
 </body>
 </html>

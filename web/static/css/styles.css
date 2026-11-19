@@ -540,32 +540,49 @@ table.data tr:hover td { background: var(--tint); }
 
 /* ---- Hero / landing -------------------------------------------------------- */
 .hero {
-  border: 1px solid var(--border); border-radius: 12px;
-  background: var(--surface);
-  padding: clamp(1.6rem, 3.2vw, 3rem);
-  position: relative; overflow: hidden;
-  box-shadow: var(--shadow);
+  min-height: 31rem;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(226, 236, 244, .26);
+  border-radius: 12px;
+  background-color: #12171b;
+  background-image:
+    linear-gradient(90deg, rgba(10, 14, 18, .92) 0%, rgba(10, 14, 18, .76) 42%, rgba(10, 14, 18, .43) 100%),
+    linear-gradient(0deg, rgba(8, 12, 16, .38), rgba(8, 12, 16, .08) 55%, rgba(8, 12, 16, .28)),
+    url("/images/construction-background.png");
+  background-position: center;
+  background-size: cover;
+  padding: clamp(1.35rem, 3vw, 2.75rem);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .24);
 }
 .hero::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background-image:
-    linear-gradient(var(--draft-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--draft-line) 1px, transparent 1px);
+    linear-gradient(rgba(235, 238, 241, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(235, 238, 241, .045) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 .hero-layout {
-  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
-  gap: clamp(1.5rem, 4vw, 4rem); align-items: center;
-  position: relative; z-index: 1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(270px, .65fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: center;
+  position: relative;
+  z-index: 1;
 }
 .hero-copy { min-width: 0; }
 .hero h1 {
   font-size: clamp(2.4rem, 5vw, 4.1rem); font-weight: 700;
   line-height: .98; margin: 0 0 1rem; letter-spacing: -.045em;
   max-width: 16ch;
+  color: #f2f4f6;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, .28);
 }
-.hero .accent { color: var(--orange); }
-.hero .lead { color: var(--ink-2); font-size: 1rem; max-width: 52ch; margin: 0 0 .65rem; line-height: 1.65; }
+.hero .accent { color: #ff8750; }
+.hero .lead { color: #e0e5e9; font-size: 1rem; max-width: 52ch; margin: 0 0 .65rem; line-height: 1.65; }
 .eyebrow, .section-kicker {
   font-family: "IBM Plex Mono", ui-monospace, monospace;
   font-size: .68rem; font-weight: 600; letter-spacing: .12em; color: var(--ink-2);
@@ -573,35 +590,83 @@ table.data tr:hover td { background: var(--tint); }
 }
 .eyebrow { display: flex; align-items: center; gap: .55rem; margin-bottom: 1.2rem; }
 .eyebrow-mark { width: 8px; height: 8px; background: var(--orange); display: inline-block; }
-.hero-note { color: var(--muted); font-size: .78rem; margin: 0 0 1.35rem; }
+.hero .eyebrow { color: #c3ccd3; }
+.hero-note { color: #b7c1c9; font-size: .78rem; margin: 0 0 1.35rem; }
 .hero-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
+.hero .btn-primary {
+  border-color: #f27a3d;
+  background: linear-gradient(110deg, #f27a3d, #ffae45);
+  color: #1f242b;
+  box-shadow: 0 6px 18px rgba(242, 122, 61, .22);
+}
+.hero .btn-primary:hover { border-color: #ffae45; background: #ffae45; }
+.hero .btn-ghost {
+  border-color: rgba(226, 236, 244, .3);
+  background: rgba(15, 20, 25, .48);
+  color: #edf1f4;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.hero .btn-ghost:hover {
+  border-color: rgba(242, 122, 61, .72);
+  background: rgba(242, 122, 61, .18);
+  color: #fff;
+}
+.hero .chip {
+  min-height: 4.2rem;
+  justify-content: center;
+  border-color: rgba(226, 236, 244, .26);
+  background: rgba(22, 28, 33, .64);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .16);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.hero .chip .n { color: #f2f4f6; font-size: 1.5rem; }
+.hero .chip .l { color: #d3dbe1; font-size: .65rem; }
+.hero .chip:nth-child(1) {
+  border-color: rgba(242, 122, 61, .72);
+  background: linear-gradient(115deg, rgba(121, 55, 30, .68), rgba(24, 27, 30, .72));
+}
+.hero .chip:nth-child(1) .n { color: #ffb18a; }
+.hero .chip:nth-child(2) {
+  border-color: rgba(255, 190, 91, .68);
+  background: linear-gradient(115deg, rgba(102, 75, 35, .68), rgba(24, 27, 30, .72));
+}
+.hero .chip:nth-child(2) .n { color: #ffdc9c; }
 .hero-aside {
-  border: 1px solid var(--border); background: var(--surface-2);
-  border-radius: 10px; padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid rgba(226, 236, 244, .32);
+  background: rgba(19, 25, 30, .68);
+  color: #edf1f4;
+  border-radius: 10px;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 255, 255, .1);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
 }
 .hero-aside-head {
   display: flex; justify-content: space-between; align-items: center;
-  padding-bottom: .8rem; border-bottom: 1px solid var(--border);
+  padding-bottom: .8rem; border-bottom: 1px solid rgba(226, 236, 244, .16);
 }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); }
+.hero-aside .eyebrow { color: #c3ccd3; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff8750; box-shadow: 0 0 12px rgba(255, 135, 80, .65); }
 .workflow-step {
   display: grid; grid-template-columns: 2rem 1fr 1rem; gap: .65rem; align-items: center;
-  padding: .85rem 0; border-bottom: 1px solid var(--border);
+  padding: .85rem 0; border-bottom: 1px solid rgba(226, 236, 244, .14);
 }
 .workflow-step > span {
   width: 1.75rem; height: 1.75rem; display: grid; place-items: center;
-  border: 1px solid var(--border); border-radius: 5px; background: var(--surface);
-  color: var(--orange); font: 600 .68rem "IBM Plex Mono", monospace;
+  border: 1px solid rgba(242, 122, 61, .4); border-radius: 6px; background: rgba(242, 122, 61, .14);
+  color: #ff9a65; font: 600 .68rem "IBM Plex Mono", monospace;
 }
 .workflow-step strong, .workflow-step small { display: block; }
-.workflow-step strong { font-size: .88rem; font-weight: 600; }
-.workflow-step small { color: var(--ink-2); font-size: .72rem; margin-top: .15rem; }
-.workflow-step svg { width: 16px; height: 16px; color: var(--orange); }
+.workflow-step strong { color: #f2f4f6; font-size: .88rem; font-weight: 600; }
+.workflow-step small { color: #b7c1c9; font-size: .72rem; margin-top: .15rem; }
+.workflow-step svg { width: 16px; height: 16px; color: #ff8750; }
 .hero-aside-foot {
   padding-top: .9rem; font: 500 .6rem "IBM Plex Mono", monospace;
-  letter-spacing: .06em; color: var(--muted);
+  letter-spacing: .06em; color: #9daab4;
 }
-.hero-aside-foot span { color: var(--orange); padding: 0 .25rem; }
+.hero-aside-foot span { color: #ff8750; padding: 0 .25rem; }
 .section-kicker {
   display: flex; justify-content: space-between; align-items: center;
   margin: 1.7rem 0 -.55rem; padding-bottom: .65rem;
@@ -702,14 +767,21 @@ table.data tr:hover td { background: var(--tint); }
 .hud-pill.info   { background: color-mix(in srgb, var(--series-blue) 11%, var(--surface)); color: var(--series-blue); border-color: color-mix(in srgb, var(--series-blue) 32%, var(--surface)); }
 
 @media (max-width: 767px) {
+  .hero {
+    min-height: 0;
+    padding: 1.2rem;
+    background-position: 62% center;
+  }
   .hero-layout { grid-template-columns: 1fr; }
+  .hero-aside { margin-top: .5rem; }
   .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero .btn-ghost { background: rgba(15, 20, 25, .66); }
   .section-kicker { align-items: flex-start; gap: .35rem; flex-direction: column; }
   main.max-w-7xl { padding-inline: 1rem; }
   .feature-card { min-height: 0; }
 }
 
-/* ---- Illustrative construction site plan ------------------------------------ */
+/* ---- Industrial construction site map --------------------------------------- */
 .site-map-heading {
   display: flex; align-items: center; justify-content: space-between;
   gap: 1rem; margin-bottom: 1rem;
@@ -755,6 +827,9 @@ table.data tr:hover td { background: var(--tint); }
   border-radius: 8px; background: var(--map-ground);
 }
 .site-plan { display: block; width: 100%; height: auto; min-height: 300px; }
+#sitePlan > :not(title):not(desc):not(defs):not(.site-plan-image):not(.site-zone) { display: none; }
+#sitePlan .site-plan-image { display: block; }
+#sitePlan .site-zone > :not(.site-zone-shape) { display: none; }
 .site-map-mobile-hint { display: none; }
 .site-ground { fill: var(--map-ground); }
 .site-grid-line { stroke: var(--map-grid); stroke-width: 1; }
@@ -819,8 +894,8 @@ table.data tr:hover td { background: var(--tint); }
 .site-plan.hide-routes .site-road-label { display: none; }
 .site-plan.hide-sources .site-source-node { display: none; }
 .site-zone-shape {
-  fill: var(--zone-fill); stroke: var(--zone-stroke); stroke-width: 2;
-  stroke-dasharray: 7 5; transition: fill .16s ease, stroke-width .16s ease, filter .16s ease;
+  fill: transparent; stroke: transparent; stroke-width: 2;
+  stroke-dasharray: 7 5; transition: stroke .16s ease, stroke-width .16s ease, filter .16s ease;
 }
 .site-zone-detail { fill: var(--zone-detail); stroke: var(--zone-stroke); stroke-width: 1.25; opacity: .88; }
 .site-zone-code { fill: var(--zone-stroke); font: 700 17px "IBM Plex Mono", monospace; letter-spacing: .07em; }
@@ -830,8 +905,12 @@ table.data tr:hover td { background: var(--tint); }
 .site-equipment-line, .site-platform-lines, .site-zone-grid { stroke: var(--zone-stroke); stroke-width: 1.4; opacity: .56; }
 .site-crane-line { stroke: var(--zone-stroke); stroke-width: 3; stroke-linecap: round; }
 .site-crane-hub { fill: var(--zone-stroke); stroke: var(--map-ground); stroke-width: 3; }
-.site-zone:hover .site-zone-shape, .site-zone:focus-visible .site-zone-shape { stroke-width: 3.5; filter: url(#zoneShadow); }
-.site-zone.selected .site-zone-shape { stroke-width: 4; stroke-dasharray: none; filter: url(#zoneShadow); }
+.site-zone:hover .site-zone-shape, .site-zone:focus-visible .site-zone-shape {
+  stroke: var(--zone-stroke); stroke-width: 3.5; filter: url(#zoneShadow);
+}
+.site-zone.selected .site-zone-shape {
+  stroke: var(--zone-stroke); stroke-width: 4; stroke-dasharray: none; filter: url(#zoneShadow);
+}
 .site-zone.selected .site-zone-code { text-decoration: underline; }
 .site-north path { fill: var(--map-accent); }
 .site-north text { fill: var(--map-label); font: 700 16px "IBM Plex Mono", monospace; }
@@ -1407,4 +1486,484 @@ table.data tr:hover td { background: var(--tint); }
     transition-duration: .01ms !important;
   }
   .view.active { animation: none; }
+}
+
+/* ---- Access gate: SAP-inspired local project entry -------------------- */
+#authGate {
+  --auth-primary: #f27a3d;
+  --auth-primary-deep: #e4571e;
+  --auth-on-primary: #1f242b;
+  --auth-canvas: #1a1f24;
+  --auth-chrome: #131619;
+  --auth-band: #2c333b;
+  --auth-band-blue: #22282f;
+  --auth-sky: #414b56;
+  --auth-ink: #ebeef1;
+  --auth-body: #d3d9df;
+  --auth-list: #b7c0c9;
+  --auth-meta: #9ba6b1;
+  display: grid;
+  grid-template-areas:
+    "brand brand"
+    "context card";
+  grid-template-columns: minmax(0, 38rem) minmax(21rem, 30rem);
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  justify-items: stretch;
+  column-gap: clamp(2rem, 5vw, 5rem);
+  row-gap: clamp(1rem, 3vh, 2rem);
+  padding: clamp(1.25rem, 3vw, 2.75rem);
+  overflow-y: auto;
+  color: var(--auth-ink);
+  background: var(--auth-chrome);
+  background-image:
+    linear-gradient(90deg, rgba(8, 12, 16, .78) 0%, rgba(8, 12, 16, .48) 46%, rgba(8, 12, 16, .66) 100%),
+    linear-gradient(0deg, rgba(8, 12, 16, .2), rgba(8, 12, 16, .2)),
+    url("/images/construction-background.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+
+body:has(#authGate:not([hidden])) { overflow: hidden; }
+
+#authGate .auth-brand {
+  grid-area: brand;
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  width: max-content;
+  max-width: 100%;
+  padding: .35rem .7rem;
+  border: 1px solid rgba(220, 231, 240, .2);
+  border-radius: 8px;
+  background: rgba(17, 22, 27, .7);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+#authGate .auth-brand .logo-badge { flex: none; }
+
+#authGate .auth-brand-name {
+  color: var(--auth-ink);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+#authGate .auth-brand-name small {
+  margin-left: .5rem;
+  color: var(--auth-meta);
+  font-size: .58rem;
+  font-weight: 500;
+}
+
+#authGate .font-mono,
+#authGate .terminal-stencil {
+  font-family: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#authGate .auth-context {
+  grid-area: context;
+  width: min(100%, 38rem);
+  justify-self: stretch;
+  color: var(--auth-body);
+}
+
+#authGate .auth-context-label {
+  margin: 0 0 1rem;
+  color: var(--auth-primary-deep);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+#authGate .auth-context h2 {
+  max-width: 13ch;
+  margin: 0;
+  color: var(--auth-ink);
+  font-size: clamp(2.25rem, 4vw, 3.5625rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+#authGate .auth-context-copy {
+  max-width: 34rem;
+  margin: 1.25rem 0 0;
+  color: var(--auth-body);
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+#authGate .auth-context-list {
+  max-width: 31rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#authGate .auth-context-list li {
+  min-height: 2.6rem;
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  margin-top: .45rem;
+  padding: .45rem .7rem;
+  border: 1px solid rgba(220, 231, 240, .2);
+  border-radius: 7px;
+  background: rgba(17, 22, 27, .54);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .12);
+  color: var(--auth-body);
+  font-size: .9375rem;
+  font-weight: 400;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#authGate .auth-context-list li svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  color: var(--auth-primary);
+}
+
+#authGate .auth-blueprint {
+  width: min(100%, 31rem);
+  margin: 1.5rem 0 0;
+  overflow: hidden;
+  border: 1px solid rgba(220, 231, 240, .24);
+  border-radius: 8px;
+  background: rgba(19, 25, 30, .78);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+#authGate .auth-blueprint svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+#authGate .auth-blueprint figcaption {
+  padding: .5rem .75rem;
+  border-top: 1px solid var(--auth-band);
+  background: rgba(19, 24, 29, .82);
+  color: var(--auth-meta);
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+#authGate .auth-context-note {
+  max-width: 31rem;
+  margin: 1.5rem 0 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--auth-primary);
+  color: var(--auth-meta);
+  font-size: .875rem;
+  line-height: 1.5;
+}
+
+#authGate .auth-card {
+  grid-area: card;
+  width: min(100%, 30rem);
+  justify-self: start;
+  padding: clamp(1.5rem, 4vw, 2rem);
+  border: 1px solid rgba(230, 239, 247, .56);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(55, 64, 72, .5), rgba(17, 22, 27, .38));
+  box-shadow:
+    0 20px 56px rgba(0, 0, 0, .42),
+    0 0 40px rgba(242, 122, 61, .28),
+    inset 0 1px 0 rgba(255, 255, 255, .24);
+  backdrop-filter: blur(30px) saturate(165%);
+  -webkit-backdrop-filter: blur(30px) saturate(165%);
+}
+
+#authGate .auth-card::before { opacity: .64; }
+
+#authGate .terminal-led-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin: 0 0 1.5rem;
+  padding: 0 0 .75rem;
+  border: 1px solid var(--auth-band);
+  border-radius: 8px;
+  background: rgba(34, 40, 47, .48);
+  color: var(--auth-meta);
+}
+
+#authGate .terminal-stencil {
+  color: var(--auth-primary);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+#authGate .terminal-led-strip .status-led {
+  width: .5rem;
+  height: .5rem;
+  box-shadow: none;
+}
+
+#authGate .logo-badge {
+  border-radius: 4px;
+  background: var(--auth-primary);
+  color: var(--auth-on-primary);
+}
+
+#authGate .auth-card h1 {
+  margin: 0;
+  color: var(--auth-ink);
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+#authGate #authGateIntro {
+  margin-top: .25rem;
+  color: var(--auth-meta) !important;
+  font-size: .9375rem;
+  line-height: 1.5;
+}
+
+#authGate .auth-form {
+  gap: .75rem;
+  margin-top: 1.5rem;
+}
+
+#authGate .auth-form.hidden { display: none; }
+
+#authGate .auth-form label {
+  color: var(--auth-body);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+#authGate .auth-form input,
+#authGate .auth-form select {
+  min-height: 2.75rem;
+  padding: .625rem .75rem;
+  border: 1px solid var(--auth-band);
+  border-radius: 8px;
+  background: rgba(13, 17, 21, .42);
+  color: var(--auth-ink);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+#authGate .auth-select {
+  position: relative;
+  min-width: 0;
+}
+
+#authGate .auth-select-native {
+  display: none !important;
+}
+
+#authGate .auth-select-trigger {
+  width: 100%;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .625rem .75rem;
+  border: 1px solid rgba(220, 231, 240, .28);
+  border-radius: 8px;
+  background: rgba(13, 17, 21, .42);
+  color: var(--auth-ink);
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease;
+}
+
+#authGate .auth-select-trigger:hover,
+#authGate .auth-select-trigger[aria-expanded="true"] {
+  border-color: rgba(242, 122, 61, .65);
+  background: rgba(34, 40, 47, .58);
+}
+
+#authGate .auth-select-trigger svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  color: var(--auth-meta);
+  transition: transform .16s ease;
+}
+
+#authGate .auth-select-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+#authGate .auth-select-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + .4rem);
+  right: 0;
+  left: 0;
+  display: grid;
+  gap: .15rem;
+  max-height: min(15rem, 40vh);
+  overflow-y: auto;
+  padding: .35rem;
+  border: 1px solid rgba(230, 239, 247, .38);
+  border-radius: 10px;
+  background: rgba(25, 31, 37, .76);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, .4), 0 0 22px rgba(242, 122, 61, .12);
+  backdrop-filter: blur(20px) saturate(155%);
+  -webkit-backdrop-filter: blur(20px) saturate(155%);
+}
+
+#authGate .auth-select-menu[hidden] { display: none; }
+
+#authGate .auth-select-option {
+  width: 100%;
+  min-height: 2.45rem;
+  display: flex;
+  align-items: center;
+  padding: .5rem .7rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--auth-ink);
+  font: inherit;
+  font-size: .9375rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background .14s ease, border-color .14s ease;
+}
+
+#authGate .auth-select-option:hover,
+#authGate .auth-select-option:focus-visible {
+  border-color: rgba(242, 122, 61, .38);
+  outline: none;
+  background: rgba(242, 122, 61, .2);
+}
+
+#authGate .auth-select-option[aria-selected="true"] {
+  border-color: rgba(242, 122, 61, .38);
+  background: rgba(242, 122, 61, .16);
+}
+
+#authGate .auth-select-option[aria-selected="true"]:hover,
+#authGate .auth-select-option[aria-selected="true"]:focus-visible {
+  background: rgba(242, 122, 61, .28);
+}
+
+#authGate .auth-form input:focus-visible,
+#authGate .auth-form select:focus-visible,
+#authGate button:focus-visible {
+  outline: 2px solid rgba(242, 122, 61, .65);
+  outline-offset: 1px;
+  box-shadow: none;
+}
+
+#authGate .btn-primary {
+  min-height: 2.75rem;
+  border: 1px solid var(--auth-primary);
+  border-radius: 8px;
+  background: linear-gradient(110deg, #f27a3d, #ffae45);
+  color: var(--auth-on-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+#authGate .btn-primary:hover {
+  border-color: var(--auth-primary-deep);
+  background: var(--auth-primary-deep);
+}
+
+#authGate .btn-ghost {
+  min-height: 2.75rem;
+  border: 1px solid var(--auth-band);
+  border-radius: 8px;
+  background: rgba(13, 17, 21, .42);
+  color: var(--auth-ink);
+  font-family: inherit;
+  font-size: .9375rem;
+  text-decoration: none;
+}
+
+#authGate .btn-ghost:hover {
+  border-color: var(--auth-primary);
+  background: var(--auth-band-blue);
+  color: var(--auth-ink);
+}
+
+#authGate .auth-setup-note,
+#authGate .auth-privacy-note {
+  color: var(--auth-meta);
+  font-size: .875rem;
+  line-height: 1.5;
+}
+
+#authGate .auth-privacy-note {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--auth-band);
+}
+
+@media (max-width: 900px) {
+  #authGate {
+    grid-template-areas:
+      "brand"
+      "card"
+      "context";
+    grid-template-columns: minmax(0, 38rem);
+    align-content: start;
+    justify-content: center;
+    justify-items: stretch;
+    row-gap: 1.5rem;
+  }
+
+  #authGate .auth-brand { justify-self: start; }
+
+  #authGate .auth-context {
+    width: 100%;
+    max-width: 38rem;
+    justify-self: stretch;
+  }
+
+  #authGate .auth-context h2 { max-width: 18ch; }
+
+  #authGate .auth-card {
+    width: min(100%, 38rem);
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  #authGate {
+    align-content: start;
+    row-gap: 1.1rem;
+    padding: 1rem;
+    background-position: 58% center;
+  }
+
+  #authGate .auth-brand-name small { display: block; margin: .1rem 0 0; }
+  #authGate .auth-context-label { margin-bottom: .5rem; }
+  #authGate .auth-context h2 { font-size: 2rem; }
+  #authGate .auth-context-copy { margin-top: .75rem; font-size: 1rem; }
+  #authGate .auth-context-list { margin-top: 1rem; }
+  #authGate .auth-blueprint { margin-top: 1rem; }
+  #authGate .auth-context-note { margin-top: 1rem; }
+  #authGate .auth-card { padding: 1.25rem; }
 }
